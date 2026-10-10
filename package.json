@@ -1,0 +1,9 @@
+{
+  "name": "nexofit-platform",
+  "version": "1.0.0",
+  "description": "NexoFit - Plataforma para Centros Deportivos",
+  "scripts": {
+    "dev:backend": "npm --prefix backend run dev",
+    "dev:frontend": "npm --prefix frontend run dev"
+  }
+}

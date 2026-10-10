@@ -1,0 +1,313 @@
+{
+  "institutions": [
+    {
+      "id": "inst-01",
+      "slug": "titan-fitness",
+      "name": "Gimnasio Titán Fitness",
+      "category": "Gimnasio",
+      "tagline": "Musculación pesada, equipamiento biomecánico y entrenamiento de fuerza.",
+      "address": "Av. Corrientes 3420, Almagro",
+      "phone": "+54 11 4862-9901",
+      "owner": {
+        "username": "carlos_titan",
+        "name": "Carlos Méndez",
+        "contractId": "NF-CONTRATO-2024-0081",
+        "contractDate": "2024-03-15",
+        "commissionRate": "8% por captación NexoFit"
+      },
+      "plans": [
+        { "id": "p-1", "name": "Musculación Libre", "price": 22000, "period": "Mensual", "desc": "Acceso ilimitado a sala de pesas y máquinas de Lunes a Sábados." },
+        { "id": "p-2", "name": "Plan Total + Cardio", "price": 27000, "period": "Mensual", "desc": "Sala de musculación + sector aeróbico + vestuarios con locker." },
+        { "id": "p-3", "name": "Pase Trimestral Ahorro", "price": 60000, "period": "Trimestral", "desc": "3 meses anticipados con descuento para deportistas regulares." }
+      ]
+    },
+    {
+      "id": "inst-02",
+      "slug": "pilates-equilibrio",
+      "name": "Centro Pilates Equilibrio & Postura",
+      "category": "Pilates",
+      "tagline": "Reformer, cadillac y rehabilitación postural guiada por kinesiólogas.",
+      "address": "Calle Laprida 1420, Recoleta",
+      "phone": "+54 11 4801-4450",
+      "owner": {
+        "username": "marcela_pilates",
+        "name": "Dra. Marcela Rossi",
+        "contractId": "NF-CONTRATO-2024-0104",
+        "contractDate": "2024-05-20",
+        "commissionRate": "8% por captación NexoFit"
+      },
+      "plans": [
+        { "id": "p-4", "name": "Reformer 2 Clases/Semana", "price": 32000, "period": "Mensual", "desc": "Grupos reducidos de hasta 4 camas por turno con seguimiento." },
+        { "id": "p-5", "name": "Reformer Intensivo 3 Clases/Semana", "price": 42000, "period": "Mensual", "desc": "Plan avanzado con plan de estiramiento y columna." }
+      ]
+    },
+    {
+      "id": "inst-03",
+      "slug": "zen-yoga-estudio",
+      "name": "Zen Studio Yoga & Meditación",
+      "category": "Yoga",
+      "tagline": "Prácticas de Hatha, Vinyasa y Ashtanga en ambiente silencioso y climatizado.",
+      "address": "Av. Santa Fe 2100, Palermo",
+      "phone": "+54 11 4825-7788",
+      "owner": {
+        "username": "esteban_yoga",
+        "name": "Prof. Esteban Varela",
+        "contractId": "NF-CONTRATO-2024-0129",
+        "contractDate": "2024-07-02",
+        "commissionRate": "8% por captación NexoFit"
+      },
+      "plans": [
+        { "id": "p-6", "name": "Pase Tradicional (8 Clases)", "price": 24000, "period": "Mensual", "desc": "Acceso a cualquier turno de Hatha o Vinyasa en el mes." },
+        { "id": "p-7", "name": "Pase Ilimitado Shala", "price": 35000, "period": "Mensual", "desc": "Práctica libre diaria + meditaciones guiadas de fin de semana." }
+      ]
+    },
+    {
+      "id": "inst-04",
+      "slug": "crossbox-norte",
+      "name": "CrossBox Norte Acondicionamiento",
+      "category": "Gimnasio",
+      "tagline": "Entrenamiento funcional de alta intensidad, levantamiento olímpico y WOD diario.",
+      "address": "Av. Cabildo 1850, Belgrano",
+      "phone": "+54 11 4788-3320",
+      "owner": {
+        "username": "rodrigo_cross",
+        "name": "Rodrigo Paz",
+        "contractId": "NF-CONTRATO-2024-0155",
+        "contractDate": "2024-08-11",
+        "commissionRate": "8% por captación NexoFit"
+      },
+      "plans": [
+        { "id": "p-8", "name": "WOD 3x Semana", "price": 28000, "period": "Mensual", "desc": "3 clases semanales con entrenador certificado L1." },
+        { "id": "p-9", "name": "Open Box & WOD Ilimitado", "price": 36000, "period": "Mensual", "desc": "Acceso a todos los turnos diarios y horas libres de Open Box." }
+      ]
+    }
+  ],
+  "members": [
+    {
+      "id": "SOC-101",
+      "institutionId": "inst-01",
+      "registeredAt": "2026-10-01 09:15:32",
+      "source": "Directo (Mostrador)",
+      "fullName": "Mariano E. López",
+      "dni": "36.882.109",
+      "phone": "11-5490-2182",
+      "email": "mariano.lopez@gmail.com",
+      "planName": "Musculación Libre",
+      "monthlyAmount": 22000,
+      "paymentStatus": "Al día",
+      "lastPaymentDate": "2026-10-01",
+      "dueDate": "2026-11-01",
+      "attendancesThisMonth": 6,
+      "lastAttendance": "2026-10-08 19:40",
+      "notes": "Socio histórico de sala de musculación."
+    },
+    {
+      "id": "SOC-102",
+      "institutionId": "inst-01",
+      "registeredAt": "2026-10-03 16:42:10",
+      "source": "NexoFit (Web Captación)",
+      "fullName": "Sofía Valentina Castro",
+      "dni": "40.119.544",
+      "phone": "11-6623-4411",
+      "email": "sofi.castro@hotmail.com",
+      "planName": "Plan Total + Cardio",
+      "monthlyAmount": 27000,
+      "paymentStatus": "Al día",
+      "lastPaymentDate": "2026-10-03",
+      "dueDate": "2026-11-03",
+      "attendancesThisMonth": 4,
+      "lastAttendance": "2026-10-09 10:15",
+      "notes": "Captada vía NexoFit. Se le entregó credencial NFC."
+    },
+    {
+      "id": "SOC-103",
+      "institutionId": "inst-01",
+      "registeredAt": "2026-09-15 11:20:00",
+      "source": "Directo (Mostrador)",
+      "fullName": "Joaquín Ramiro Torres",
+      "dni": "33.450.981",
+      "phone": "11-4091-8890",
+      "email": "jtorres@fibertel.com.ar",
+      "planName": "Musculación Libre",
+      "monthlyAmount": 22000,
+      "paymentStatus": "Vencida",
+      "lastPaymentDate": "2026-09-15",
+      "dueDate": "2026-10-05",
+      "attendancesThisMonth": 1,
+      "lastAttendance": "2026-10-02 20:05",
+      "notes": "Avisar en recepción por cuota vencida de octubre."
+    },
+    {
+      "id": "SOC-104",
+      "institutionId": "inst-01",
+      "registeredAt": "2026-10-06 18:04:19",
+      "source": "NexoFit (Web Captación)",
+      "fullName": "Lucía Micaela Gómez",
+      "dni": "42.503.210",
+      "phone": "11-3310-7744",
+      "email": "lu.gomez99@gmail.com",
+      "planName": "Musculación Libre",
+      "monthlyAmount": 22000,
+      "paymentStatus": "Pendiente",
+      "lastPaymentDate": "-",
+      "dueDate": "2026-10-16",
+      "attendancesThisMonth": 2,
+      "lastAttendance": "2026-10-07 18:30",
+      "notes": "Inscripta en la app NexoFit. Pendiente de pago presencial."
+    },
+    {
+      "id": "SOC-105",
+      "institutionId": "inst-01",
+      "registeredAt": "2026-10-07 14:10:45",
+      "source": "NexoFit (Web Captación)",
+      "fullName": "Gonzalo Ignacio Ferreyra",
+      "dni": "38.712.330",
+      "phone": "11-5802-9900",
+      "email": "gonza.ferreyra@live.com",
+      "planName": "Plan Total + Cardio",
+      "monthlyAmount": 27000,
+      "paymentStatus": "Al día",
+      "lastPaymentDate": "2026-10-07",
+      "dueDate": "2026-11-07",
+      "attendancesThisMonth": 3,
+      "lastAttendance": "2026-10-09 19:10",
+      "notes": "Lead convertido mediante NexoFit."
+    },
+    {
+      "id": "SOC-201",
+      "institutionId": "inst-02",
+      "registeredAt": "2026-10-02 10:00:15",
+      "source": "Directo (Mostrador)",
+      "fullName": "Beatriz Irene Morales",
+      "dni": "28.409.112",
+      "phone": "11-4411-8920",
+      "email": "beatriz.morales@arnet.com.ar",
+      "planName": "Reformer 2 Clases/Semana",
+      "monthlyAmount": 32000,
+      "paymentStatus": "Al día",
+      "lastPaymentDate": "2026-10-02",
+      "dueDate": "2026-11-02",
+      "attendancesThisMonth": 3,
+      "lastAttendance": "2026-10-08 11:00",
+      "notes": "Derivación médica por lumbalgia."
+    },
+    {
+      "id": "SOC-202",
+      "institutionId": "inst-02",
+      "registeredAt": "2026-10-05 17:35:22",
+      "source": "NexoFit (Web Captación)",
+      "fullName": "Camila Victoria Peralta",
+      "dni": "41.802.934",
+      "phone": "11-6200-1122",
+      "email": "cami.peralta@gmail.com",
+      "planName": "Reformer Intensivo 3 Clases/Semana",
+      "monthlyAmount": 42000,
+      "paymentStatus": "Al día",
+      "lastPaymentDate": "2026-10-05",
+      "dueDate": "2026-11-05",
+      "attendancesThisMonth": 2,
+      "lastAttendance": "2026-10-07 18:00",
+      "notes": "Turno tarde captado por plataforma NexoFit."
+    },
+    {
+      "id": "SOC-301",
+      "institutionId": "inst-03",
+      "registeredAt": "2026-10-04 08:30:11",
+      "source": "NexoFit (Web Captación)",
+      "fullName": "Agustina Belén Rivas",
+      "dni": "39.992.401",
+      "phone": "11-7301-4455",
+      "email": "agustina.rivas@outlook.com",
+      "planName": "Pase Ilimitado Shala",
+      "monthlyAmount": 35000,
+      "paymentStatus": "Al día",
+      "lastPaymentDate": "2026-10-04",
+      "dueDate": "2026-11-04",
+      "attendancesThisMonth": 5,
+      "lastAttendance": "2026-10-09 08:00",
+      "notes": "Práctica matutina Ashtanga."
+    },
+    {
+      "id": "SOC-401",
+      "institutionId": "inst-04",
+      "registeredAt": "2026-10-02 19:11:05",
+      "source": "Directo (Mostrador)",
+      "fullName": "Mateo Ezequiel Benítez",
+      "dni": "37.210.665",
+      "phone": "11-3990-2100",
+      "email": "mateo.benitez@gmail.com",
+      "planName": "Open Box & WOD Ilimitado",
+      "monthlyAmount": 36000,
+      "paymentStatus": "Al día",
+      "lastPaymentDate": "2026-10-02",
+      "dueDate": "2026-11-02",
+      "attendancesThisMonth": 7,
+      "lastAttendance": "2026-10-09 20:00",
+      "notes": "Categoría RX."
+    }
+  ],
+  "users": [
+    {
+      "id": "usr-01",
+      "username": "carlos_titan",
+      "password": "password123",
+      "name": "Carlos Méndez",
+      "role": "OWNER",
+      "institutionId": "inst-01"
+    },
+    {
+      "id": "usr-02",
+      "username": "marcela_pilates",
+      "password": "password123",
+      "name": "Dra. Marcela Rossi",
+      "role": "OWNER",
+      "institutionId": "inst-02"
+    },
+    {
+      "id": "usr-03",
+      "username": "esteban_yoga",
+      "password": "password123",
+      "name": "Prof. Esteban Varela",
+      "role": "OWNER",
+      "institutionId": "inst-03"
+    },
+    {
+      "id": "usr-04",
+      "username": "rodrigo_cross",
+      "password": "password123",
+      "name": "Rodrigo Paz",
+      "role": "OWNER",
+      "institutionId": "inst-04"
+    },
+    {
+      "id": "usr-05",
+      "username": "mariano_cliente",
+      "password": "password123",
+      "name": "Mariano E. López",
+      "role": "CLIENT",
+      "dni": "36.882.109",
+      "phone": "11-5490-2182",
+      "email": "mariano.lopez@gmail.com"
+    },
+    {
+      "id": "usr-06",
+      "username": "valeria_cliente",
+      "password": "password123",
+      "name": "Valeria Montes",
+      "role": "CLIENT",
+      "dni": "39.400.128",
+      "phone": "11-2345-6789",
+      "email": "valeria.montes@gmail.com"
+    },
+    {
+      "id": "usr-07",
+      "username": "lucas_cliente",
+      "password": "password123",
+      "name": "Lucas Herrera",
+      "role": "CLIENT",
+      "dni": "37.890.123",
+      "phone": "11-4567-8901",
+      "email": "lucas.herrera@gmail.com"
+    }
+  ]
+}
