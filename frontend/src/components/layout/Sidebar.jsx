@@ -148,36 +148,102 @@ export default function Sidebar({
 
       {!isOwner && clientFilters && isCatalogActive && (
         <div className="sidebar-group">
-          <div className="sidebar-header">Directorio de Centros Afiliados</div>
+          <div className="sidebar-header">Filtros del Directorio</div>
           <div className="p-2">
             <Form.Group className="mb-2">
               <Form.Label className="small fw-bold mb-1">Disciplina</Form.Label>
               <Form.Select
                 size="sm"
-                value={clientFilters.category}
-                onChange={(e) => clientFilters.setCategory(e.target.value)}
+                value={clientFilters.selectedCategory || clientFilters.category || 'ALL'}
+                onChange={(e) => (clientFilters.setSelectedCategory || clientFilters.setCategory)(e.target.value)}
               >
                 <option value="ALL">Todas las disciplinas</option>
                 <option value="Gimnasio">Gimnasios & Musculación</option>
                 <option value="Pilates">Centros de Pilates</option>
                 <option value="Yoga">Estudios de Yoga</option>
+                <option value="CrossFit">CrossFit & Funcional</option>
+                <option value="Natación">Natación & Piletas</option>
+                <option value="Pádel">Canchas de Pádel</option>
+                <option value="Artes Marciales">Artes Marciales</option>
+                <option value="Calistenia">Calistenia & Barras</option>
+                <option value="Spinning">Spinning & Ciclismo</option>
+                <option value="Danza">Danza & Expresión</option>
               </Form.Select>
             </Form.Group>
 
             <Form.Group className="mb-2">
-              <Form.Label className="small fw-bold mb-1">Búsqueda</Form.Label>
+              <Form.Label className="small fw-bold mb-1">Zona / Barrio</Form.Label>
+              <Form.Select
+                size="sm"
+                value={clientFilters.selectedNeighborhood || 'ALL'}
+                onChange={(e) => clientFilters.setSelectedNeighborhood && clientFilters.setSelectedNeighborhood(e.target.value)}
+              >
+                <option value="ALL">Todos los barrios</option>
+                <option value="Centro">Centro</option>
+                <option value="Los Perales">Los Perales</option>
+                <option value="Alto Comedero">Alto Comedero</option>
+                <option value="Ciudad de Nieva">Ciudad de Nieva</option>
+                <option value="Cuyaya">Cuyaya</option>
+                <option value="San Pedrito">San Pedrito</option>
+                <option value="Bajo La Viña">Bajo La Viña</option>
+                <option value="Chijra">Chijra</option>
+                <option value="Coronel Arias">Coronel Arias</option>
+                <option value="Gorriti">Gorriti</option>
+                <option value="Huaico">Huaico</option>
+                <option value="Moreno">Moreno</option>
+                <option value="Santa Rosa">Santa Rosa</option>
+                <option value="Reyes">Reyes</option>
+                <option value="Mariano Moreno">Mariano Moreno</option>
+              </Form.Select>
+            </Form.Group>
+
+            <Form.Group className="mb-2">
+              <Form.Label className="small fw-bold mb-1">Franja Horaria / Turno</Form.Label>
+              <Form.Select
+                size="sm"
+                value={clientFilters.selectedShift || 'ALL'}
+                onChange={(e) => clientFilters.setSelectedShift && clientFilters.setSelectedShift(e.target.value)}
+              >
+                <option value="ALL">Cualquier turno</option>
+                <option value="Noche">🌙 Noche (Post-laboral)</option>
+                <option value="Tarde">☀️ Tarde (12:00 a 18:00)</option>
+                <option value="Mañana">🌅 Mañana (07:00 a 12:00)</option>
+              </Form.Select>
+            </Form.Group>
+
+            <Form.Group className="mb-2">
+              <Form.Label className="small fw-bold mb-1">Búsqueda rápida</Form.Label>
               <Form.Control
                 size="sm"
                 type="text"
-                placeholder="Buscar por barrio o nombre..."
-                value={clientFilters.search}
-                onChange={(e) => clientFilters.setSearch(e.target.value)}
+                placeholder="Nombre o calle..."
+                value={clientFilters.searchTerm != null ? clientFilters.searchTerm : (clientFilters.search || '')}
+                onChange={(e) => (clientFilters.setSearchTerm || clientFilters.setSearch)(e.target.value)}
               />
             </Form.Group>
 
-            <div className="small text-muted">
+            <div className="small text-muted mb-2">
               Mostrando {clientFilters.filteredCount} de {clientFilters.totalCount} centros.
             </div>
+
+            {((clientFilters.selectedCategory && clientFilters.selectedCategory !== 'ALL') ||
+              (clientFilters.selectedNeighborhood && clientFilters.selectedNeighborhood !== 'ALL') ||
+              (clientFilters.selectedShift && clientFilters.selectedShift !== 'ALL') ||
+              clientFilters.searchTerm) && (
+              <Button
+                variant="light"
+                size="sm"
+                className="w-100 border text-muted"
+                onClick={() => {
+                  if (clientFilters.setSelectedCategory) clientFilters.setSelectedCategory('ALL');
+                  if (clientFilters.setSelectedNeighborhood) clientFilters.setSelectedNeighborhood('ALL');
+                  if (clientFilters.setSelectedShift) clientFilters.setSelectedShift('ALL');
+                  if (clientFilters.setSearchTerm) clientFilters.setSearchTerm('');
+                }}
+              >
+                Limpiar filtros
+              </Button>
+            )}
           </div>
         </div>
       )}

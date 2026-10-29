@@ -23,7 +23,12 @@ export default function RegisterView({ onRegisterSuccess, onNavigateToLogin }) {
     formState: { errors }
   } = useForm({
     defaultValues: {
-      category: 'Gimnasio'
+      category: 'Gimnasio',
+      neighborhood: 'Centro',
+      preferredShift: 'Noche',
+      institutionNeighborhood: 'Centro',
+      institutionSchedule: 'Lun a Vie 07:00 a 23:00 | Sáb 09:00 a 18:00',
+      institutionShifts: 'Jornada Completa'
     }
   });
 
@@ -43,11 +48,22 @@ export default function RegisterView({ onRegisterSuccess, onNavigateToLogin }) {
 
     if (role === 'CLIENT') {
       payload.dni = formData.dni;
+      payload.neighborhood = formData.neighborhood || 'Centro';
+      payload.preferredShift = formData.preferredShift || 'Noche';
     } else {
+      const shiftsMap = {
+        'Jornada Completa': ['Mañana', 'Tarde', 'Noche'],
+        'Diurno': ['Mañana', 'Tarde'],
+        'Tarde y Noche': ['Tarde', 'Noche'],
+        'Nocturno': ['Noche']
+      };
       payload.institutionData = {
         name: formData.institutionName,
         category: formData.category,
         address: formData.address,
+        neighborhood: formData.institutionNeighborhood || 'Centro',
+        schedule: formData.institutionSchedule || 'Lun a Vie 07:00 a 23:00',
+        shifts: shiftsMap[formData.institutionShifts] || ['Mañana', 'Tarde', 'Noche'],
         phone: formData.institutionPhone || formData.phone,
         tagline: formData.tagline
       };
@@ -246,6 +262,47 @@ export default function RegisterView({ onRegisterSuccess, onNavigateToLogin }) {
                 )}
               </Row>
 
+              {role === 'CLIENT' && (
+                <Row className="g-2 mb-3">
+                  <Col xs={12} md={6}>
+                    <Form.Group controlId="clientNeighborhood">
+                      <Form.Label className="small fw-bold mb-1">
+                        Barrio de Residencia *
+                      </Form.Label>
+                      <Form.Select size="sm" {...register('neighborhood')}>
+                        <option value="Centro">Centro</option>
+                        <option value="Los Perales">Los Perales</option>
+                        <option value="Alto Comedero">Alto Comedero</option>
+                        <option value="Ciudad de Nieva">Ciudad de Nieva</option>
+                        <option value="Cuyaya">Cuyaya</option>
+                        <option value="San Pedrito">San Pedrito</option>
+                        <option value="Bajo La Viña">Bajo La Viña</option>
+                        <option value="Chijra">Chijra</option>
+                        <option value="Coronel Arias">Coronel Arias</option>
+                        <option value="Gorriti">Gorriti</option>
+                        <option value="Huaico">Huaico</option>
+                        <option value="Moreno">Moreno</option>
+                        <option value="Santa Rosa">Santa Rosa</option>
+                        <option value="Reyes">Reyes</option>
+                        <option value="Mariano Moreno">Mariano Moreno</option>
+                      </Form.Select>
+                    </Form.Group>
+                  </Col>
+                  <Col xs={12} md={6}>
+                    <Form.Group controlId="clientPreferredShift">
+                      <Form.Label className="small fw-bold mb-1">
+                        Horario Habitual de Entrenamiento *
+                      </Form.Label>
+                      <Form.Select size="sm" {...register('preferredShift')}>
+                        <option value="Noche">Turno Noche (18:00 a 23:00 / Post-laboral)</option>
+                        <option value="Tarde">Turno Tarde (12:00 a 18:00)</option>
+                        <option value="Mañana">Turno Mañana (07:00 a 12:00)</option>
+                      </Form.Select>
+                    </Form.Group>
+                  </Col>
+                </Row>
+              )}
+
               {role === 'OWNER' && (
                 <div className="p-3 mb-3 bg-light border rounded-2">
                   <div className="small fw-bold text-uppercase mb-2 text-primary">
@@ -291,12 +348,12 @@ export default function RegisterView({ onRegisterSuccess, onNavigateToLogin }) {
                     <Col xs={12} md={7}>
                       <Form.Group controlId="instAddress">
                         <Form.Label className="small fw-bold mb-1">
-                          Dirección y Barrio *
+                          Dirección de la Sede *
                         </Form.Label>
                         <Form.Control
                           size="sm"
                           type="text"
-                          placeholder="Av. Fascio 850, Centro"
+                          placeholder="Av. Fascio 850"
                           isInvalid={Boolean(errors.address)}
                           {...register('address', { required: 'Dirección requerida' })}
                         />
@@ -307,6 +364,63 @@ export default function RegisterView({ onRegisterSuccess, onNavigateToLogin }) {
                     </Col>
 
                     <Col xs={12} md={5}>
+                      <Form.Group controlId="instNeighborhood">
+                        <Form.Label className="small fw-bold mb-1">
+                          Barrio de la Sede *
+                        </Form.Label>
+                        <Form.Select size="sm" {...register('institutionNeighborhood')}>
+                          <option value="Centro">Centro</option>
+                          <option value="Los Perales">Los Perales</option>
+                          <option value="Alto Comedero">Alto Comedero</option>
+                          <option value="Ciudad de Nieva">Ciudad de Nieva</option>
+                          <option value="Cuyaya">Cuyaya</option>
+                          <option value="San Pedrito">San Pedrito</option>
+                          <option value="Bajo La Viña">Bajo La Viña</option>
+                          <option value="Chijra">Chijra</option>
+                          <option value="Coronel Arias">Coronel Arias</option>
+                          <option value="Gorriti">Gorriti</option>
+                          <option value="Huaico">Huaico</option>
+                          <option value="Moreno">Moreno</option>
+                          <option value="Santa Rosa">Santa Rosa</option>
+                          <option value="Reyes">Reyes</option>
+                          <option value="Mariano Moreno">Mariano Moreno</option>
+                        </Form.Select>
+                      </Form.Group>
+                    </Col>
+                  </Row>
+
+                  <Row className="g-2 mb-2">
+                    <Col xs={12} md={6}>
+                      <Form.Group controlId="instSchedule">
+                        <Form.Label className="small fw-bold mb-1">
+                          Horario de Atención
+                        </Form.Label>
+                        <Form.Control
+                          size="sm"
+                          type="text"
+                          placeholder="Lun a Vie 07:00 a 23:00"
+                          {...register('institutionSchedule')}
+                        />
+                      </Form.Group>
+                    </Col>
+
+                    <Col xs={12} md={6}>
+                      <Form.Group controlId="instShifts">
+                        <Form.Label className="small fw-bold mb-1">
+                          Turnos que Cubre la Sede
+                        </Form.Label>
+                        <Form.Select size="sm" {...register('institutionShifts')}>
+                          <option value="Jornada Completa">Jornada Completa (Mañana, Tarde y Noche)</option>
+                          <option value="Diurno">Diurno (Mañana y Tarde)</option>
+                          <option value="Tarde y Noche">Vespertino / Nocturno (Tarde y Noche)</option>
+                          <option value="Nocturno">Exclusivo Nocturno (Noche)</option>
+                        </Form.Select>
+                      </Form.Group>
+                    </Col>
+                  </Row>
+
+                  <Row className="g-2 mb-2">
+                    <Col xs={12} md={6}>
                       <Form.Group controlId="instPhone">
                         <Form.Label className="small fw-bold mb-1">
                           Teléfono de la Sede
@@ -319,19 +433,21 @@ export default function RegisterView({ onRegisterSuccess, onNavigateToLogin }) {
                         />
                       </Form.Group>
                     </Col>
-                  </Row>
 
-                  <Form.Group controlId="instTagline">
-                    <Form.Label className="small fw-bold mb-1">
-                      Lema o Descripción Breve
-                    </Form.Label>
-                    <Form.Control
-                      size="sm"
-                      type="text"
-                      placeholder="Equipamiento moderno y clases guiadas."
-                      {...register('tagline')}
-                    />
-                  </Form.Group>
+                    <Col xs={12} md={6}>
+                      <Form.Group controlId="instTagline">
+                        <Form.Label className="small fw-bold mb-1">
+                          Lema o Descripción Breve
+                        </Form.Label>
+                        <Form.Control
+                          size="sm"
+                          type="text"
+                          placeholder="Equipamiento moderno y clases guiadas."
+                          {...register('tagline')}
+                        />
+                      </Form.Group>
+                    </Col>
+                  </Row>
                 </div>
               )}
 

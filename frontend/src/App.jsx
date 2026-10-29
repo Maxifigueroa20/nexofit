@@ -51,6 +51,8 @@ export default function App() {
 
   const [clientCategory, setClientCategory] = useState('ALL');
   const [clientSearch, setClientSearch] = useState('');
+  const [clientNeighborhood, setClientNeighborhood] = useState('ALL');
+  const [clientShift, setClientShift] = useState('ALL');
 
   const { data: institutionsData, isLoading: isLoadingInstitutions } = useQuery({
     queryKey: ['institutions'],
@@ -241,18 +243,53 @@ export default function App() {
         clientCategory === 'ALL' ||
         inst.category === clientCategory;
 
+      const matchesNeighborhood =
+        clientNeighborhood === 'ALL' ||
+        inst.neighborhood === clientNeighborhood;
+
+      const matchesShift =
+        clientShift === 'ALL' ||
+        (Array.isArray(inst.shifts) && inst.shifts.includes(clientShift));
+
       const q = clientSearch.toLowerCase();
       const matchesSearch =
         inst.name.toLowerCase().includes(q) ||
         inst.address.toLowerCase().includes(q) ||
+        (inst.neighborhood && inst.neighborhood.toLowerCase().includes(q)) ||
         inst.tagline.toLowerCase().includes(q);
 
-      return matchesCat && matchesSearch;
+      return matchesCat && matchesNeighborhood && matchesShift && matchesSearch;
     })
     .sort((a, b) => {
+      if (currentUser?.role === 'CLIENT') {
+        const aMatchBarrio = Boolean(currentUser.neighborhood && a.neighborhood === currentUser.neighborhood);
+        const bMatchBarrio = Boolean(currentUser.neighborhood && b.neighborhood === currentUser.neighborhood);
+
+        const aMatchTurno = Boolean(currentUser.preferredShift && Array.isArray(a.shifts) && a.shifts.includes(currentUser.preferredShift));
+        const bMatchTurno = Boolean(currentUser.preferredShift && Array.isArray(b.shifts) && b.shifts.includes(currentUser.preferredShift));
+
+        const aHasMatch = aMatchBarrio || aMatchTurno;
+        const bHasMatch = bMatchBarrio || bMatchTurno;
+
+        let aScore = (aMatchBarrio ? 3 : 0) + (aMatchTurno ? 2 : 0);
+        let bScore = (bMatchBarrio ? 3 : 0) + (bMatchTurno ? 2 : 0);
+
+        if (aHasMatch && a.isPremium) aScore += 1.5;
+        if (bHasMatch && b.isPremium) bScore += 1.5;
+
+        if (bScore !== aScore) {
+          return bScore - aScore;
+        }
+
+        if (a.isPremium && !b.isPremium) return -1;
+        if (!a.isPremium && b.isPremium) return 1;
+
+        return a.name.localeCompare(b.name);
+      }
+
       if (a.isPremium && !b.isPremium) return -1;
       if (!a.isPremium && b.isPremium) return 1;
-      return 0;
+      return a.name.localeCompare(b.name);
     });
 
   const ownerFiltersProp = {
@@ -267,8 +304,14 @@ export default function App() {
   const clientFiltersProp = {
     selectedCategory: clientCategory,
     setSelectedCategory: setClientCategory,
+    selectedNeighborhood: clientNeighborhood,
+    setSelectedNeighborhood: setClientNeighborhood,
+    selectedShift: clientShift,
+    setSelectedShift: setClientShift,
     searchTerm: clientSearch,
-    setSearchTerm: setClientSearch
+    setSearchTerm: setClientSearch,
+    filteredCount: filteredInstitutions.length,
+    totalCount: institutions.length
   };
 
   if (!currentUser) {

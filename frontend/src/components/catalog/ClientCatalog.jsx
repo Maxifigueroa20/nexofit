@@ -235,6 +235,16 @@ export default function ClientCatalog({
 
   return (
     <div className="w-100">
+      {currentUser?.role === 'CLIENT' && (currentUser.neighborhood || currentUser.preferredShift) && (
+        <div className="p-2 mb-3 bg-light border small d-flex align-items-center justify-content-between flex-wrap gap-2">
+          <span>
+            <Icon name="person-check-fill" className="text-primary me-1" />
+            Feed personalizado para <strong>{currentUser.name}</strong>: Priorizando sedes en <strong>{currentUser.neighborhood || 'tu zona'}</strong> con atención en <strong>Turno {currentUser.preferredShift || 'habitual'}</strong>.
+          </span>
+          <Badge bg="light" text="dark" className="border">Preferencia de Perfil</Badge>
+        </div>
+      )}
+
       <div className="d-flex justify-content-between align-items-center mb-3 p-2 bg-light border small flex-wrap gap-2">
         <span className="text-muted">
           Mostrando <strong>{filteredInstitutions.length === 0 ? 0 : startIndex + 1}-{Math.min(startIndex + pageSize, filteredInstitutions.length)}</strong> de <strong>{filteredInstitutions.length}</strong> centros deportivos en Jujuy
@@ -260,6 +270,8 @@ export default function ClientCatalog({
         ) : (
           paginatedInstitutions.map((inst) => {
             const isEnrolled = enrolledInstitutionIds.includes(inst.id);
+            const isMatchBarrio = Boolean(currentUser?.role === 'CLIENT' && currentUser?.neighborhood && inst.neighborhood === currentUser.neighborhood);
+            const isMatchTurno = Boolean(currentUser?.role === 'CLIENT' && currentUser?.preferredShift && Array.isArray(inst.shifts) && inst.shifts.includes(currentUser.preferredShift));
 
             return (
               <Col xs={12} lg={6} key={inst.id}>
@@ -289,7 +301,24 @@ export default function ClientCatalog({
                     </p>
 
                     <Card className="p-2 mb-3 small bg-light border-0">
-                      <div><strong>Dirección:</strong> {inst.address}</div>
+                      <div className="d-flex justify-content-between align-items-center mb-1 flex-wrap gap-1">
+                        <div>
+                          <Icon name="geo-alt-fill" className="text-primary me-1" />
+                          <strong>Barrio:</strong> {inst.neighborhood || 'Centro'} &bull; {inst.address}
+                        </div>
+                        {isMatchBarrio && (
+                          <Badge bg="info" text="dark">En tu barrio</Badge>
+                        )}
+                      </div>
+                      <div className="d-flex justify-content-between align-items-center mb-1 flex-wrap gap-1">
+                        <div>
+                          <Icon name="clock-fill" className="text-muted me-1" />
+                          <strong>Horario:</strong> {inst.schedule || 'Lun a Vie 08:00 a 22:00'}
+                        </div>
+                        {isMatchTurno && (
+                          <Badge bg="primary">Tu turno ({currentUser.preferredShift})</Badge>
+                        )}
+                      </div>
                       <div><strong>Teléfono:</strong> {inst.phone}</div>
                       <div><strong>Socios:</strong> {inst.stats?.totalMembers || 0} ({inst.stats?.nexoFitConverted || 0} por NexoFit)</div>
                     </Card>
