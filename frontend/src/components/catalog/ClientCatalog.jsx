@@ -20,7 +20,6 @@ export default function ClientCatalog({
   onEnrollSuccess
 }) {
   const [selectedInstitutionForEnroll, setSelectedInstitutionForEnroll] = useState(null);
-  const [selectedPlanForEnroll, setSelectedPlanForEnroll] = useState(null);
 
   const enrolledInstitutionIds = clientMemberships.map((m) => m.institutionId);
 
@@ -79,9 +78,8 @@ export default function ClientCatalog({
     return items;
   };
 
-  const handleOpenEnroll = (inst, plan) => {
+  const handleOpenEnroll = (inst) => {
     setSelectedInstitutionForEnroll(inst);
-    setSelectedPlanForEnroll(plan);
   };
 
   const handleEnrollSubmit = async (institutionId, memberData) => {
@@ -295,75 +293,51 @@ export default function ClientCatalog({
                     </div>
                   </Card.Header>
 
-                  <Card.Body className="d-flex flex-column flex-grow-1 p-3">
+                  <Card.Body className="d-flex flex-column p-3">
                     <p className="small text-muted fst-italic mb-2">
                       "{inst.tagline}"
                     </p>
 
-                    <Card className="p-2 mb-3 small bg-light border-0">
-                      <div className="d-flex justify-content-between align-items-center mb-1 flex-wrap gap-1">
-                        <div>
-                          <Icon name="geo-alt-fill" className="text-primary me-1" />
-                          <strong>Barrio:</strong> {inst.neighborhood || 'Centro'} &bull; {inst.address}
-                        </div>
+                    <div className="small mb-2">
+                      <Icon name="geo-alt-fill" className="text-primary me-1" />
+                      <strong>Ubicación:</strong> {inst.neighborhood ? `${inst.neighborhood} • ` : ''}{inst.address} &bull; {inst.phone}
+                    </div>
+
+                    <div className="small mb-2">
+                      <Icon name="clock-fill" className="text-muted me-1" />
+                      <strong>Franja horaria:</strong> {inst.schedule || 'Lun a Vie 08:00 a 22:00'}
+                    </div>
+
+                    {(isMatchBarrio || isMatchTurno) && (
+                      <div className="d-flex gap-1 flex-wrap mb-2">
                         {isMatchBarrio && (
-                          <Badge bg="info" text="dark">En tu barrio</Badge>
+                          <Badge bg="info" text="dark">
+                            <Icon name="geo-alt-fill" className="me-1" />
+                            En tu barrio ({inst.neighborhood})
+                          </Badge>
                         )}
-                      </div>
-                      <div className="d-flex justify-content-between align-items-center mb-1 flex-wrap gap-1">
-                        <div>
-                          <Icon name="clock-fill" className="text-muted me-1" />
-                          <strong>Horario:</strong> {inst.schedule || 'Lun a Vie 08:00 a 22:00'}
-                        </div>
                         {isMatchTurno && (
-                          <Badge bg="primary">Tu turno ({currentUser.preferredShift})</Badge>
+                          <Badge bg="primary">
+                            <Icon name="clock-fill" className="me-1" />
+                            Tu turno ({currentUser.preferredShift})
+                          </Badge>
                         )}
                       </div>
-                      <div><strong>Teléfono:</strong> {inst.phone}</div>
-                      <div><strong>Socios:</strong> {inst.stats?.totalMembers || 0} ({inst.stats?.nexoFitConverted || 0} por NexoFit)</div>
-                    </Card>
-
-                    <div className="flex-grow-1">
-                      <div className="small fw-bold text-primary mb-1">
-                        Planes y Aranceles:
-                      </div>
-                      <Table hover size="sm" className="mb-2 align-middle">
-                        <tbody>
-                          {inst.plans.map((plan) => (
-                            <tr key={plan.id}>
-                              <td>{plan.name} ({plan.period})</td>
-                              <td className="text-end fw-bold text-success">
-                                ${plan.price.toLocaleString('es-AR')}
-                              </td>
-                              <td className="text-end">
-                                <Button
-                                  variant="primary"
-                                  size="sm"
-                                  disabled={isEnrolled}
-                                  onClick={() => handleOpenEnroll(inst, plan)}
-                                >
-                                  Elegir Plan
-                                </Button>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </Table>
-                    </div>
-
-                    <div className="pt-2 border-top d-flex justify-content-between align-items-center mt-auto">
-                      <span className={`small ${isEnrolled ? 'fw-bold text-success' : 'text-muted'}`}>
-                        {isEnrolled ? 'Matriculado' : 'No matriculado'}
-                      </span>
-                      <Button
-                        variant="success"
-                        disabled={isEnrolled}
-                        onClick={() => handleOpenEnroll(inst, inst.plans[0])}
-                      >
-                        {isEnrolled ? 'Matriculado' : 'Asociarme'}
-                      </Button>
-                    </div>
+                    )}
                   </Card.Body>
+
+                  <Card.Footer className="bg-light py-2 px-3 d-flex justify-content-between align-items-center border-top mt-auto">
+                    <span className={`small ${isEnrolled ? 'fw-bold text-success' : 'text-muted'}`}>
+                      {isEnrolled ? 'Matriculado' : 'No matriculado'}
+                    </span>
+                    <Button
+                      variant={isEnrolled ? 'secondary' : 'primary'}
+                      size="sm"
+                      onClick={() => handleOpenEnroll(inst)}
+                    >
+                      {isEnrolled ? 'Ver detalle' : 'Ver más / Asociarme'}
+                    </Button>
+                  </Card.Footer>
                 </Card>
               </Col>
             );
@@ -387,8 +361,8 @@ export default function ClientCatalog({
         isOpen={Boolean(selectedInstitutionForEnroll)}
         onClose={() => setSelectedInstitutionForEnroll(null)}
         institution={selectedInstitutionForEnroll}
-        initialPlan={selectedPlanForEnroll}
-        initialUser={currentUser}
+        currentUser={currentUser}
+        isEnrolled={enrolledInstitutionIds.includes(selectedInstitutionForEnroll?.id)}
         onSubmit={handleEnrollSubmit}
       />
     </div>
