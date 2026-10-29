@@ -272,7 +272,6 @@ export default function OwnerDashboard({
                             onClick={() => handleRegisterAttendance(member.id)}
                             title="Registrar ingreso en sala"
                           >
-                            <Icon name="check-lg" className="me-1" />
                             Check-in
                           </Button>
                           <Button

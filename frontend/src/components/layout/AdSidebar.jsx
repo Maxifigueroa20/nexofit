@@ -29,9 +29,8 @@ export default function AdSidebar() {
   return (
     <aside className="app-sidebar app-sidebar-ads">
       <div className="sidebar-group p-2">
-        <div className="d-flex justify-content-between align-items-center pb-1 mb-2 border-bottom">
+        <div className="d-flex align-items-center pb-1 mb-2 border-bottom">
           <span className="fw-bold text-muted" style={{ fontSize: '10px' }}>PUBLICIDAD</span>
-          <a href="#" className="fb-link" style={{ fontSize: '10px' }} onClick={(e) => e.preventDefault()}>Crear anuncio</a>
         </div>
 
         <div className="d-flex flex-column gap-3">
@@ -51,10 +50,6 @@ export default function AdSidebar() {
               </div>
             </div>
           ))}
-        </div>
-
-        <div className="text-muted pt-2 mt-2 border-top text-center" style={{ fontSize: '9px' }}>
-          Sustenta el acceso libre para deportistas
         </div>
       </div>
     </aside>

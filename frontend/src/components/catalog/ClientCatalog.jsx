@@ -274,7 +274,7 @@ export default function ClientCatalog({
                     <div className="d-flex align-items-center gap-1">
                       {inst.isPremium && (
                         <Badge bg="warning" text="dark">
-                          #1 Destacado
+                          Destacado
                         </Badge>
                       )}
                       <Badge bg="secondary">

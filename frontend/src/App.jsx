@@ -216,7 +216,7 @@ export default function App() {
     showToast(
       updatedInstitution.isPremium ? '¡Modo Premium Activado!' : 'Modo Premium Desactivado',
       updatedInstitution.isPremium
-        ? `${updatedInstitution.name} ahora figura en el Puesto #1 del Catálogo con distintivo de Sede Destacada.`
+        ? `${updatedInstitution.name} ahora figura en el Catálogo con distintivo de Sede Destacada.`
         : `${updatedInstitution.name} volvió a la modalidad regular.`
     );
   };

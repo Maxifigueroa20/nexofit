@@ -57,8 +57,7 @@ a:hover,
   gap: 10px;
   min-height: 42px;
   box-sizing: border-box;
-  border-top-left-radius: 9px;
-  border-top-right-radius: 9px;
+  border-radius: 0;
 }
 
 .brand-title {
@@ -126,17 +125,21 @@ a:hover,
 .well-card {
   background-color: var(--fb-surface);
   border: 1px solid var(--fb-border);
-  border-radius: 2px;
+  border-radius: 3px;
+  overflow: hidden;
 }
 
 .sidebar-header,
-.card-header {
+.card-header,
+.card-header:first-child {
   background-color: var(--fb-blue);
   color: #ffffff;
   font-size: clamp(12px, 0.25vw + 11.5px, 13px);
   font-weight: bold;
   padding: 6px 10px;
+  border: 0;
   border-bottom: 1px solid var(--fb-border);
+  border-radius: 0 !important;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -290,8 +293,7 @@ a:hover,
   color: #ffffff;
   border-bottom: 1px solid var(--fb-blue-dark);
   padding: 8px 14px;
-  border-top-left-radius: 7px;
-  border-top-right-radius: 7px;
+  border-radius: 0 !important;
 }
 
 .modal-header .btn-close {
@@ -319,8 +321,7 @@ a:hover,
   background-color: #f2f2f2;
   border-top: 1px solid #cccccc;
   padding: 6px 12px;
-  border-bottom-left-radius: 7px;
-  border-bottom-right-radius: 7px;
+  border-radius: 0 !important;
 }
 
 .toast-notification {
