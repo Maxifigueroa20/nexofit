@@ -78,6 +78,11 @@ class AuthService {
         address: institutionData.address.trim(),
         phone: institutionData.phone?.trim() || phone?.trim() || 'S/D',
         isPremium: false,
+        neighborhood: institutionData.neighborhood?.trim() || 'Centro',
+        schedule: institutionData.schedule?.trim() || 'Lun a Vie 08:00 a 22:00',
+        shifts: Array.isArray(institutionData.shifts) && institutionData.shifts.length > 0
+          ? institutionData.shifts
+          : ['Mañana', 'Tarde', 'Noche'],
         owner: {
           username: cleanUsername,
           name: name.trim(),
@@ -124,6 +129,8 @@ class AuthService {
       dni: dni ? dni.trim() : 'S/D',
       phone: phone ? phone.trim() : 'S/D',
       email: email ? email.trim() : 'S/D',
+      neighborhood: payload.neighborhood?.trim() || 'Centro',
+      preferredShift: payload.preferredShift?.trim() || 'Noche',
       institutionId: role === 'OWNER' ? institutionId : undefined,
       termsAccepted: true,
       termsAcceptedDate

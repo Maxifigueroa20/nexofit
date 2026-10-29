@@ -12,6 +12,8 @@ function formatUser(row) {
     dni: row.dni,
     phone: row.phone,
     email: row.email,
+    neighborhood: row.neighborhood || 'Centro',
+    preferredShift: row.preferred_shift || row.preferredShift || 'Noche',
     termsAccepted: Boolean(row.terms_accepted != null ? row.terms_accepted : row.termsAccepted),
     termsAcceptedDate: row.terms_accepted_date || row.termsAcceptedDate
   };
@@ -51,8 +53,8 @@ class UserModel {
   static async create(userData) {
     if (isPostgres()) {
       await query(
-        `INSERT INTO users (id, username, password, name, role, institution_id, dni, phone, email, terms_accepted, terms_accepted_date)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
+        `INSERT INTO users (id, username, password, name, role, institution_id, dni, phone, email, neighborhood, preferred_shift, terms_accepted, terms_accepted_date)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`,
         [
           userData.id,
           userData.username,
@@ -63,6 +65,8 @@ class UserModel {
           userData.dni,
           userData.phone,
           userData.email,
+          userData.neighborhood || 'Centro',
+          userData.preferredShift || 'Noche',
           Boolean(userData.termsAccepted),
           userData.termsAcceptedDate
         ]

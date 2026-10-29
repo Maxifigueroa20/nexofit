@@ -44,10 +44,17 @@ async function initDatabase() {
         address VARCHAR(255) NOT NULL,
         phone VARCHAR(100),
         is_premium BOOLEAN DEFAULT FALSE,
+        neighborhood VARCHAR(100),
+        schedule VARCHAR(255),
+        shifts JSONB DEFAULT '[]',
         owner JSONB DEFAULT '{}',
         plans JSONB DEFAULT '[]',
         stats JSONB DEFAULT '{}'
       );
+
+      ALTER TABLE institutions ADD COLUMN IF NOT EXISTS neighborhood VARCHAR(100);
+      ALTER TABLE institutions ADD COLUMN IF NOT EXISTS schedule VARCHAR(255);
+      ALTER TABLE institutions ADD COLUMN IF NOT EXISTS shifts JSONB DEFAULT '[]';
 
       CREATE TABLE IF NOT EXISTS members (
         id VARCHAR(100) PRIMARY KEY,
@@ -78,9 +85,14 @@ async function initDatabase() {
         dni VARCHAR(50),
         phone VARCHAR(100),
         email VARCHAR(255),
+        neighborhood VARCHAR(100),
+        preferred_shift VARCHAR(50),
         terms_accepted BOOLEAN DEFAULT TRUE,
         terms_accepted_date VARCHAR(50)
       );
+
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS neighborhood VARCHAR(100);
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS preferred_shift VARCHAR(50);
     `);
 
     const countRes = await pool.query('SELECT COUNT(*) FROM institutions');
@@ -89,8 +101,8 @@ async function initDatabase() {
       try {
         for (const inst of memoryData.institutions) {
           await pool.query(
-            `INSERT INTO institutions (id, slug, name, category, tagline, address, phone, is_premium, owner, plans, stats)
-             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
+            `INSERT INTO institutions (id, slug, name, category, tagline, address, phone, is_premium, neighborhood, schedule, shifts, owner, plans, stats)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)`,
             [
               inst.id,
               inst.slug,
@@ -100,6 +112,9 @@ async function initDatabase() {
               inst.address,
               inst.phone,
               Boolean(inst.isPremium),
+              inst.neighborhood || 'Centro',
+              inst.schedule || 'Lun a Vie 08:00 a 22:00',
+              JSON.stringify(inst.shifts || ['Mañana', 'Tarde', 'Noche']),
               JSON.stringify(inst.owner || {}),
               JSON.stringify(inst.plans || []),
               JSON.stringify(inst.stats || {})
@@ -134,8 +149,8 @@ async function initDatabase() {
 
         for (const u of memoryData.users) {
           await pool.query(
-            `INSERT INTO users (id, username, password, name, role, institution_id, dni, phone, email, terms_accepted, terms_accepted_date)
-             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
+            `INSERT INTO users (id, username, password, name, role, institution_id, dni, phone, email, neighborhood, preferred_shift, terms_accepted, terms_accepted_date)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`,
             [
               u.id,
               u.username,
@@ -146,6 +161,8 @@ async function initDatabase() {
               u.dni,
               u.phone,
               u.email,
+              u.neighborhood || 'Centro',
+              u.preferredShift || 'Noche',
               Boolean(u.termsAccepted),
               u.termsAcceptedDate
             ]
@@ -182,8 +199,8 @@ async function resetDatabase() {
 
       for (const inst of memoryData.institutions) {
         await pool.query(
-          `INSERT INTO institutions (id, slug, name, category, tagline, address, phone, is_premium, owner, plans, stats)
-           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
+          `INSERT INTO institutions (id, slug, name, category, tagline, address, phone, is_premium, neighborhood, schedule, shifts, owner, plans, stats)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)`,
           [
             inst.id,
             inst.slug,
@@ -193,6 +210,9 @@ async function resetDatabase() {
             inst.address,
             inst.phone,
             Boolean(inst.isPremium),
+            inst.neighborhood || 'Centro',
+            inst.schedule || 'Lun a Vie 08:00 a 22:00',
+            JSON.stringify(inst.shifts || ['Mañana', 'Tarde', 'Noche']),
             JSON.stringify(inst.owner || {}),
             JSON.stringify(inst.plans || []),
             JSON.stringify(inst.stats || {})
@@ -227,8 +247,8 @@ async function resetDatabase() {
 
       for (const u of memoryData.users) {
         await pool.query(
-          `INSERT INTO users (id, username, password, name, role, institution_id, dni, phone, email, terms_accepted, terms_accepted_date)
-           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
+          `INSERT INTO users (id, username, password, name, role, institution_id, dni, phone, email, neighborhood, preferred_shift, terms_accepted, terms_accepted_date)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`,
           [
             u.id,
             u.username,
@@ -239,6 +259,8 @@ async function resetDatabase() {
             u.dni,
             u.phone,
             u.email,
+            u.neighborhood || 'Centro',
+            u.preferredShift || 'Noche',
             Boolean(u.termsAccepted),
             u.termsAcceptedDate
           ]

@@ -209,12 +209,77 @@ function generateTagline(category, neighborhood) {
   return faker.helpers.arrayElement(pool);
 }
 
+function getScheduleAndShifts(category) {
+  switch (category) {
+    case 'Gimnasio':
+    case 'CrossFit':
+      return {
+        schedule: 'Lun a Vie 07:00 a 23:00 | Sáb 09:00 a 18:00',
+        shifts: ['Mañana', 'Tarde', 'Noche']
+      };
+    case 'Pádel':
+      return {
+        schedule: 'Lun a Dom 08:00 a 00:00',
+        shifts: ['Mañana', 'Tarde', 'Noche']
+      };
+    case 'Natación':
+      return {
+        schedule: 'Lun a Vie 07:00 a 22:00 | Sáb 08:00 a 14:00',
+        shifts: ['Mañana', 'Tarde', 'Noche']
+      };
+    case 'Pilates':
+      return {
+        schedule: 'Lun a Vie 08:00 a 12:00 y 16:00 a 20:30',
+        shifts: ['Mañana', 'Tarde']
+      };
+    case 'Yoga':
+      return {
+        schedule: 'Lun a Vie 08:30 a 12:00 y 17:00 a 21:00',
+        shifts: ['Mañana', 'Tarde', 'Noche']
+      };
+    default:
+      return {
+        schedule: 'Lun a Vie 08:00 a 22:00',
+        shifts: ['Mañana', 'Tarde', 'Noche']
+      };
+  }
+}
+
 function buildSeeds() {
   const existingRaw = fs.readFileSync(SEED_FILE, 'utf8');
   const existing = JSON.parse(existingRaw);
 
-  const baseInstitutions = existing.institutions.slice(0, 4);
-  const baseUsers = existing.users.slice(0, 7);
+  const baseInstitutions = existing.institutions.slice(0, 4).map((inst, idx) => {
+    const schedules = [
+      { neighborhood: 'Centro', schedule: 'Lun a Vie 07:00 a 23:00 | Sáb 09:00 a 18:00', shifts: ['Mañana', 'Tarde', 'Noche'] },
+      { neighborhood: 'Centro', schedule: 'Lun a Vie 08:00 a 12:00 y 16:00 a 20:30', shifts: ['Mañana', 'Tarde'] },
+      { neighborhood: 'Los Perales', schedule: 'Lun a Vie 08:30 a 12:00 y 17:00 a 21:00', shifts: ['Mañana', 'Tarde', 'Noche'] },
+      { neighborhood: 'San Pedrito', schedule: 'Lun a Vie 07:00 a 22:30 | Sáb 10:00 a 14:00', shifts: ['Mañana', 'Tarde', 'Noche'] }
+    ];
+    return {
+      ...inst,
+      ...schedules[idx]
+    };
+  });
+
+  const baseUsers = existing.users.slice(0, 7).map((u) => {
+    let neighborhood = 'Centro';
+    let preferredShift = 'Noche';
+    if (u.username === 'valeria_fit' || u.username === 'laura_yoga') {
+      neighborhood = 'Los Perales';
+      preferredShift = 'Tarde';
+    } else if (u.username === 'matias_cross' || u.username === 'martin_box') {
+      neighborhood = 'San Pedrito';
+      preferredShift = 'Noche';
+    } else if (u.username === 'carlos_titan') {
+      preferredShift = 'Mañana';
+    }
+    return {
+      ...u,
+      neighborhood,
+      preferredShift
+    };
+  });
   const baseMembers = existing.members.slice(0, 10);
 
   const institutions = [...baseInstitutions];
@@ -247,7 +312,9 @@ function buildSeeds() {
       password: 'password123',
       name: ownerName,
       role: 'OWNER',
-      institutionId: id
+      institutionId: id,
+      neighborhood,
+      preferredShift: faker.helpers.arrayElement(['Mañana', 'Tarde', 'Noche'])
     };
     users.push(ownerUser);
 
@@ -255,6 +322,8 @@ function buildSeeds() {
       ...p,
       id: `p-${i}-${pIdx + 1}`
     }));
+
+    const scheduleData = getScheduleAndShifts(category);
 
     const instObj = {
       id,
@@ -265,6 +334,9 @@ function buildSeeds() {
       address,
       phone,
       isPremium,
+      neighborhood,
+      schedule: scheduleData.schedule,
+      shifts: scheduleData.shifts,
       owner: {
         username,
         name: ownerName,
