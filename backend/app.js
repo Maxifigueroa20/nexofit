@@ -3,10 +3,24 @@ const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
 const apiRoutes = require('./routes');
+const { CLIENT_URL } = require('./config');
 
 const app = express();
 
-app.use(cors());
+const allowedOrigins = CLIENT_URL ? CLIENT_URL.split(',').map((u) => u.trim()) : [];
+
+const corsOptions = {
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.length === 0 || allowedOrigins.includes(origin) || origin.startsWith('http://localhost:')) {
+      callback(null, true);
+    } else {
+      callback(new Error('Acceso no permitido por política CORS'));
+    }
+  },
+  credentials: true
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
 app.use('/api', apiRoutes);
