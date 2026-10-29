@@ -24,7 +24,7 @@ class SseService {
     clients.forEach((client) => {
       try {
         client.res.write(message);
-      } catch (err) {}
+      } catch (err) { }
     });
   }
 }

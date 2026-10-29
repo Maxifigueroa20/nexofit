@@ -5,7 +5,9 @@ class SseController {
     res.writeHead(200, {
       'Content-Type': 'text/event-stream',
       'Cache-Control': 'no-cache',
-      'Connection': 'keep-alive'
+      'Connection': 'keep-alive',
+      'X-Accel-Buffering': 'no',
+      'Access-Control-Allow-Origin': '*'
     });
 
     const clientId = `${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;

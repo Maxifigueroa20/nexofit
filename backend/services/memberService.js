@@ -3,8 +3,8 @@ const InstitutionModel = require('../models/institutionModel');
 const SseService = require('./sseService');
 
 class MemberService {
-  static getMembersByInstitution(institutionId, filters = {}) {
-    let members = MemberModel.findByInstitutionId(institutionId);
+  static async getMembersByInstitution(institutionId, filters = {}) {
+    let members = await MemberModel.findByInstitutionId(institutionId);
 
     const { search, status, source } = filters;
 
@@ -30,8 +30,8 @@ class MemberService {
     return members.sort((a, b) => new Date(b.registeredAt) - new Date(a.registeredAt));
   }
 
-  static enrollMember(institutionId, memberData) {
-    const inst = InstitutionModel.findById(institutionId);
+  static async enrollMember(institutionId, memberData) {
+    const inst = await InstitutionModel.findById(institutionId);
     if (!inst) {
       throw new Error('Institución no válida');
     }
@@ -69,7 +69,7 @@ class MemberService {
       notes: notes ? notes.trim() : 'Inscripción procesada mediante la plataforma de captación NexoFit.'
     };
 
-    MemberModel.create(newMember);
+    await MemberModel.create(newMember);
 
     SseService.broadcast('NEW_MEMBER', {
       institutionId,
@@ -80,8 +80,8 @@ class MemberService {
     return newMember;
   }
 
-  static togglePaymentStatus(memberId) {
-    const member = MemberModel.findById(memberId);
+  static async togglePaymentStatus(memberId) {
+    const member = await MemberModel.findById(memberId);
     if (!member) {
       throw new Error('Socio no encontrado');
     }
@@ -94,15 +94,15 @@ class MemberService {
       updates.lastPaymentDate = new Date().toISOString().split('T')[0];
     }
 
-    const updated = MemberModel.update(memberId, updates);
+    const updated = await MemberModel.update(memberId, updates);
 
     SseService.broadcast('PAYMENT_STATUS_CHANGED', { member: updated });
 
     return updated;
   }
 
-  static recordAttendance(memberId) {
-    const member = MemberModel.findById(memberId);
+  static async recordAttendance(memberId) {
+    const member = await MemberModel.findById(memberId);
     if (!member) {
       throw new Error('Socio no encontrado');
     }
@@ -111,7 +111,7 @@ class MemberService {
     const pad = (n) => String(n).padStart(2, '0');
     const lastAttendance = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
 
-    const updated = MemberModel.update(memberId, {
+    const updated = await MemberModel.update(memberId, {
       attendancesThisMonth: (member.attendancesThisMonth || 0) + 1,
       lastAttendance
     });
@@ -121,12 +121,15 @@ class MemberService {
     return updated;
   }
 
-  static getMembersByDni(dni) {
-    return MemberModel.findAll().filter((m) => m.dni === dni);
+  static async getMembersByDni(dni) {
+    const clean = (v) => String(v || '').replace(/\D/g, '');
+    const target = clean(dni);
+    const all = await MemberModel.findAll();
+    return all.filter((m) => (target ? clean(m.dni) === target : m.dni === dni));
   }
 
-  static resetDatabase() {
-    MemberModel.reset();
+  static async resetDatabase() {
+    await MemberModel.reset();
     SseService.broadcast('DB_RESET', {});
   }
 }
