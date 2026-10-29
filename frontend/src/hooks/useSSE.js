@@ -1,12 +1,16 @@
 import { useState, useEffect, useRef } from 'react';
+import { getApiUrl } from '../config/api';
 
 export default function useSSE(onEvent) {
   const [isConnected, setIsConnected] = useState(false);
   const onEventRef = useRef(onEvent);
-  onEventRef.current = onEvent;
 
   useEffect(() => {
-    const eventSource = new EventSource('/api/events');
+    onEventRef.current = onEvent;
+  }, [onEvent]);
+
+  useEffect(() => {
+    const eventSource = new EventSource(getApiUrl('/api/events'));
 
     eventSource.onopen = () => {
       setIsConnected(true);
