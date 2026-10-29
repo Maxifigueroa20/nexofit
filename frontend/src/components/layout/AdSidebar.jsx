@@ -35,19 +35,19 @@ export default function AdSidebar() {
 
         <div className="d-flex flex-column gap-3">
           {ads.map((ad) => (
-            <div key={ad.id} className="d-flex gap-2">
+            <div key={ad.id} className="d-flex flex-column gap-1">
               <div
-                className={`d-flex align-items-center justify-content-center flex-shrink-0 rounded-1 ${ad.iconBg}`}
-                style={{ width: '40px', height: '40px' }}
+                className={`d-flex align-items-center justify-content-center w-100 rounded-1 ${ad.iconBg}`}
+                style={{ height: '65px' }}
               >
-                <Icon name={ad.icon} className="fs-5" />
+                <Icon name={ad.icon} className="fs-2" />
               </div>
-              <div className="flex-grow-1" style={{ fontSize: '10px', lineHeight: '1.3' }}>
-                <a href="#" className="fb-link d-block" onClick={(e) => e.preventDefault()}>
-                  {ad.title}
-                </a>
-                <span className="text-secondary">{ad.desc}</span>
-              </div>
+              <a href="#" className="fb-link d-block fw-bold" style={{ fontSize: '11px', lineHeight: '1.25' }} onClick={(e) => e.preventDefault()}>
+                {ad.title}
+              </a>
+              <span className="text-secondary" style={{ fontSize: '10px', lineHeight: '1.35' }}>
+                {ad.desc}
+              </span>
             </div>
           ))}
         </div>
