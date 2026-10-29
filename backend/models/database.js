@@ -173,6 +173,49 @@ async function initDatabase() {
         await pool.query('ROLLBACK');
         throw insertErr;
       }
+    } else {
+      const nullCheck = await pool.query(
+        'SELECT COUNT(*) FROM institutions WHERE neighborhood IS NULL OR schedule IS NULL'
+      );
+      if (parseInt(nullCheck.rows[0].count, 10) > 0) {
+        await pool.query('BEGIN');
+        try {
+          for (const inst of memoryData.institutions) {
+            await pool.query(
+              `UPDATE institutions
+               SET neighborhood = $1,
+                   schedule = $2,
+                   shifts = $3,
+                   tagline = $4
+               WHERE id = $5`,
+              [
+                inst.neighborhood || 'Centro',
+                inst.schedule || 'Lun a Vie 08:00 a 22:00',
+                JSON.stringify(inst.shifts || ['Mañana']),
+                inst.tagline,
+                inst.id
+              ]
+            );
+          }
+          for (const u of memoryData.users) {
+            await pool.query(
+              `UPDATE users
+               SET neighborhood = $1,
+                   preferred_shift = $2
+               WHERE username = $3`,
+              [
+                u.neighborhood || 'Centro',
+                u.preferredShift || 'Noche',
+                u.username
+              ]
+            );
+          }
+          await pool.query('COMMIT');
+        } catch (backfillErr) {
+          await pool.query('ROLLBACK');
+          console.error('[PostgreSQL Backfill Error]', backfillErr.message);
+        }
+      }
     }
 
     isPostgresActive = true;
