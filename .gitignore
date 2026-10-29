@@ -1,6 +1,35 @@
+# Dependencies & environments
 node_modules/
-.DS_Store
+.venv/
+
+# Environment files & secrets
+.env
+.env.*
+!.env.example
+
+# Build & runtime artifacts
 dist/
 dist-ssr/
 *.local
+.DS_Store
+Thumbs.db
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Scraper & temporary data
 temp/
+.playwright/
+.playwright-cli/
+
+# Editor & IDE
+.vscode/
+.idea/
+
+# AI agents, skills & tools
+.agents/
+.impeccable/
+AGENTS.md
+skills-lock.json
