@@ -11,11 +11,13 @@ const allowedOrigins = CLIENT_URL ? CLIENT_URL.split(',').map((u) => u.trim()) :
 
 const corsOptions = {
   origin: (origin, callback) => {
-    if (!origin || allowedOrigins.length === 0 || allowedOrigins.includes(origin) || origin.startsWith('http://localhost:')) {
-      callback(null, true);
-    } else {
-      callback(new Error('Acceso no permitido por política CORS'));
+    if (origin && allowedOrigins.includes(origin)) {
+      return callback(null, true);
     }
+    if (process.env.NODE_ENV !== 'production' && (!origin || origin.startsWith('http://localhost:'))) {
+      return callback(null, true);
+    }
+    return callback(new Error('Acceso denegado: origen no autorizado o CLIENT_URL no configurada'));
   },
   credentials: true
 };
@@ -38,6 +40,9 @@ app.use((req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
+  if (err.message && err.message.includes('Acceso denegado')) {
+    return res.status(403).json({ error: err.message });
+  }
   console.error('[Error no controlado]', err);
   res.status(500).json({ error: 'Error interno del servidor', detail: err.message });
 });
