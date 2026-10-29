@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import Badge from 'react-bootstrap/Badge';
-import Card from 'react-bootstrap/Card';
-import Icon from '../common/Icon';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
 
 export default function EnrollmentModal({
   isOpen,
@@ -17,7 +17,8 @@ export default function EnrollmentModal({
 
   if (!institution) return null;
 
-  const selectedPlan = institution.plans?.find((p) => p.id === selectedPlanId) || institution.plans?.[0] || null;
+  const plans = institution.plans || [];
+  const selectedPlan = plans.find((p) => p.id === selectedPlanId) || plans[0] || null;
 
   const handleConfirm = () => {
     if (!selectedPlan) return;
@@ -34,97 +35,139 @@ export default function EnrollmentModal({
   };
 
   return (
-    <Modal show={Boolean(isOpen)} onHide={onClose} centered size="lg">
-      <Modal.Header closeButton>
-        <Modal.Title className="fs-6 fw-bold text-white d-flex align-items-center gap-2">
-          {institution.isPremium && <Icon name="star-fill" className="text-warning" />}
-          {institution.name} &bull; Perfil y Afiliación
+    <Modal
+      show={Boolean(isOpen)}
+      onHide={onClose}
+      centered
+      size="lg"
+      aria-labelledby="institution-modal-title"
+    >
+      <Modal.Header closeButton className="py-2 px-3">
+        <Modal.Title id="institution-modal-title" className="fs-6 fw-bold text-white d-flex align-items-center gap-2">
+          <span>{institution.name}</span>
+          {institution.isPremium && (
+            <Badge bg="warning" text="dark" className="fw-semibold">
+              Destacado
+            </Badge>
+          )}
+          <Badge bg="secondary" className="fw-normal">
+            {institution.category}
+          </Badge>
         </Modal.Title>
       </Modal.Header>
 
       <Modal.Body className="p-3">
-        <p className="small text-muted fst-italic mb-3">
+        <p className="text-secondary fst-italic mb-3">
           "{institution.tagline}"
         </p>
 
-        <Card className="p-2 mb-3 small bg-light border rounded-1">
-          <div className="d-flex justify-content-between align-items-center mb-1 flex-wrap gap-1">
-            <div>
-              <Icon name="geo-alt-fill" className="text-primary me-1" />
-              <strong>Sede:</strong> {institution.neighborhood ? `${institution.neighborhood} • ` : ''}{institution.address}
-            </div>
-            <Badge bg="secondary">{institution.category}</Badge>
-          </div>
-          <div className="mb-1">
-            <Icon name="clock-fill" className="text-muted me-1" />
-            <strong>Horarios:</strong> {institution.schedule || 'Lun a Vie 08:00 a 22:00'}
-          </div>
-          <div className="d-flex align-items-center gap-1 mb-1 flex-wrap">
-            <strong className="text-muted">Turnos disponibles:</strong>
-            {Array.isArray(institution.shifts) && institution.shifts.map((s) => (
-              <Badge key={s} bg="light" text="dark" className="border">
-                {s}
-              </Badge>
-            ))}
-          </div>
-          <div>
-            <strong>Contacto:</strong> {institution.phone} &bull; <strong>Comunidad:</strong> {institution.stats?.totalMembers || 0} socios
-          </div>
-        </Card>
+        <div className="bg-light border rounded-1 p-3 mb-3">
+          <Row className="g-2 small">
+            <Col xs={12} sm={6}>
+              <div className="text-muted text-uppercase fw-semibold" style={{ fontSize: '11px' }}>
+                Ubicación
+              </div>
+              <div className="text-dark fw-medium">
+                {institution.neighborhood ? `${institution.neighborhood} • ` : ''}{institution.address}
+              </div>
+            </Col>
+            <Col xs={12} sm={6}>
+              <div className="text-muted text-uppercase fw-semibold" style={{ fontSize: '11px' }}>
+                Contacto Directo
+              </div>
+              <div className="text-dark fw-medium">
+                {institution.phone}
+              </div>
+            </Col>
+            <Col xs={12} sm={6}>
+              <div className="text-muted text-uppercase fw-semibold" style={{ fontSize: '11px' }}>
+                Horario de Atención
+              </div>
+              <div className="text-dark fw-medium">
+                {institution.schedule || 'Lun a Vie 08:00 a 22:00'}
+              </div>
+            </Col>
+            <Col xs={12} sm={6}>
+              <div className="text-muted text-uppercase fw-semibold" style={{ fontSize: '11px' }}>
+                Turnos Disponibles
+              </div>
+              <div className="d-flex gap-1 flex-wrap mt-1">
+                {Array.isArray(institution.shifts) && institution.shifts.map((shift) => (
+                  <Badge key={shift} bg="light" text="dark" className="border fw-normal">
+                    {shift}
+                  </Badge>
+                ))}
+              </div>
+            </Col>
+          </Row>
+        </div>
 
-        <div className="mb-3">
-          <div className="small fw-bold text-primary mb-2">
-            Seleccionar Plan de Entrenamiento:
-          </div>
-          <div className="d-flex flex-column gap-2">
-            {institution.plans?.map((plan) => {
+        <fieldset className="mb-2">
+          <legend id="plan-selector-legend" className="fs-6 fw-semibold text-dark mb-2">
+            Planes y aranceles disponibles
+          </legend>
+
+          <div
+            className="d-flex flex-column gap-2"
+            role="radiogroup"
+            aria-labelledby="plan-selector-legend"
+          >
+            {plans.map((plan) => {
               const isSelected = selectedPlan?.id === plan.id;
+              const inputId = `plan-radio-${institution.id}-${plan.id}`;
+
               return (
-                <Button
-                  key={plan.id}
-                  type="button"
-                  variant={isSelected ? 'primary' : 'light'}
-                  className={`text-start p-2 border ${isSelected ? 'border-primary shadow-sm' : ''}`}
-                  onClick={() => setSelectedPlanId(plan.id)}
-                >
-                  <div className="d-flex justify-content-between align-items-center">
-                    <strong>{plan.name}</strong>
-                    <span className={`badge ${isSelected ? 'bg-warning text-dark' : 'bg-success'}`}>
-                      ${plan.price.toLocaleString('es-AR')} / {plan.period}
-                    </span>
-                  </div>
-                  <div className="small opacity-75 mt-1">
-                    {plan.desc || 'Acceso completo a instalaciones.'}
-                  </div>
-                </Button>
+                <div key={plan.id} className="position-relative">
+                  <input
+                    type="radio"
+                    className="btn-check"
+                    name={`plan-selection-${institution.id}`}
+                    id={inputId}
+                    autoComplete="off"
+                    checked={isSelected}
+                    onChange={() => setSelectedPlanId(plan.id)}
+                  />
+                  <label
+                    htmlFor={inputId}
+                    className={`btn text-start w-100 p-3 border rounded-2 d-flex justify-content-between align-items-center ${
+                      isSelected
+                        ? 'border-primary bg-primary-subtle text-dark shadow-sm'
+                        : 'border-secondary-subtle bg-white text-dark'
+                    }`}
+                  >
+                    <div>
+                      <div className="fw-semibold fs-6 text-dark">{plan.name}</div>
+                      <div className="small text-secondary mt-1">
+                        {plan.desc || 'Acceso completo a instalaciones y equipamiento.'}
+                      </div>
+                    </div>
+                    <div className="text-end ps-3">
+                      <div className="fw-bold fs-6 text-primary">
+                        ${plan.price.toLocaleString('es-AR')}
+                      </div>
+                      <span className="small text-muted text-uppercase" style={{ fontSize: '11px' }}>
+                        {plan.period}
+                      </span>
+                    </div>
+                  </label>
+                </div>
               );
             })}
           </div>
-        </div>
-
-        <div className="p-2 bg-light border rounded-1 small">
-          <div className="fw-bold text-secondary mb-1">
-            <Icon name="person-check-fill" className="text-primary me-1" />
-            Matriculación Automática:
-          </div>
-          <div className="text-muted">
-            <strong>Titular:</strong> {currentUser?.name} &bull; <strong>DNI:</strong> {currentUser?.dni || 'S/D'} &bull; <strong>Email:</strong> {currentUser?.email || 'S/D'}
-          </div>
-        </div>
+        </fieldset>
       </Modal.Body>
 
-      <Modal.Footer className="d-flex justify-content-between align-items-center">
+      <Modal.Footer className="d-flex justify-content-between align-items-center py-2 px-3">
         <Button variant="light" size="sm" onClick={onClose}>
           Cerrar
         </Button>
         <Button
-          variant="success"
+          variant="primary"
           size="sm"
           disabled={isEnrolled || !selectedPlan}
           onClick={handleConfirm}
         >
-          <Icon name="check-lg" className="me-1" />
-          {isEnrolled ? 'Ya estás matriculado' : `Asociarme con ${selectedPlan?.name || 'este plan'}`}
+          {isEnrolled ? 'Ya matriculado' : 'Asociarme'}
         </Button>
       </Modal.Footer>
     </Modal>

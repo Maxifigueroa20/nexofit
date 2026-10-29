@@ -210,39 +210,78 @@ function generateTagline(category, neighborhood) {
 }
 
 function getScheduleAndShifts(category) {
-  switch (category) {
-    case 'Gimnasio':
-    case 'CrossFit':
-      return {
-        schedule: 'Lun a Vie 07:00 a 23:00 | Sáb 09:00 a 18:00',
-        shifts: ['Mañana', 'Tarde', 'Noche']
-      };
-    case 'Pádel':
-      return {
-        schedule: 'Lun a Dom 08:00 a 00:00',
-        shifts: ['Mañana', 'Tarde', 'Noche']
-      };
-    case 'Natación':
-      return {
-        schedule: 'Lun a Vie 07:00 a 22:00 | Sáb 08:00 a 14:00',
-        shifts: ['Mañana', 'Tarde', 'Noche']
-      };
-    case 'Pilates':
-      return {
-        schedule: 'Lun a Vie 08:00 a 12:00 y 16:00 a 20:30',
-        shifts: ['Mañana', 'Tarde']
-      };
-    case 'Yoga':
-      return {
-        schedule: 'Lun a Vie 08:30 a 12:00 y 17:00 a 21:00',
-        shifts: ['Mañana', 'Tarde', 'Noche']
-      };
-    default:
-      return {
-        schedule: 'Lun a Vie 08:00 a 22:00',
-        shifts: ['Mañana', 'Tarde', 'Noche']
-      };
-  }
+  const profileOptions = [
+    {
+      weight: 15,
+      schedule: faker.helpers.arrayElement([
+        'Lun a Sáb 07:00 a 12:30',
+        'Lun a Vie 06:30 a 12:00',
+        'Lun a Sáb 08:00 a 13:00'
+      ]),
+      shifts: ['Mañana']
+    },
+    {
+      weight: 15,
+      schedule: faker.helpers.arrayElement([
+        'Lun a Vie 15:00 a 20:30',
+        'Lun a Vie 14:00 a 19:30',
+        'Lun a Vie 16:00 a 21:00'
+      ]),
+      shifts: ['Tarde']
+    },
+    {
+      weight: 15,
+      schedule: faker.helpers.arrayElement([
+        'Lun a Vie 19:30 a 23:30',
+        'Lun a Vie 20:00 a 00:00',
+        'Lun a Sáb 20:00 a 23:00'
+      ]),
+      shifts: ['Noche']
+    },
+    {
+      weight: 20,
+      schedule: faker.helpers.arrayElement([
+        'Lun a Vie 08:00 a 12:30 y 16:00 a 20:30',
+        'Lun a Vie 07:30 a 12:00 y 15:30 a 20:00',
+        'Lun a Sáb 08:00 a 13:00 y 16:00 a 20:00'
+      ]),
+      shifts: ['Mañana', 'Tarde']
+    },
+    {
+      weight: 20,
+      schedule: faker.helpers.arrayElement([
+        'Lun a Vie 16:00 a 23:30',
+        'Lun a Vie 17:00 a 23:00 | Sáb 16:00 a 22:00',
+        'Lun a Dom 18:00 a 00:00'
+      ]),
+      shifts: ['Tarde', 'Noche']
+    },
+    {
+      weight: 5,
+      schedule: faker.helpers.arrayElement([
+        'Lun a Vie 07:00 a 11:30 y 19:30 a 22:30',
+        'Lun a Vie 06:30 a 11:00 y 20:00 a 23:00'
+      ]),
+      shifts: ['Mañana', 'Noche']
+    },
+    {
+      weight: 10,
+      schedule: faker.helpers.arrayElement([
+        'Lun a Vie 07:00 a 23:00 | Sáb 09:00 a 14:00',
+        'Lun a Dom 07:30 a 23:30',
+        'Lun a Vie 06:30 a 23:00 | Sáb 08:00 a 20:00'
+      ]),
+      shifts: ['Mañana', 'Tarde', 'Noche']
+    }
+  ];
+
+  const chosen = faker.helpers.weightedArrayElement(
+    profileOptions.map((opt) => ({ weight: opt.weight, value: opt }))
+  );
+  return {
+    schedule: chosen.schedule,
+    shifts: [...chosen.shifts]
+  };
 }
 
 function buildSeeds() {
@@ -253,8 +292,8 @@ function buildSeeds() {
     const schedules = [
       { neighborhood: 'Centro', schedule: 'Lun a Vie 07:00 a 23:00 | Sáb 09:00 a 18:00', shifts: ['Mañana', 'Tarde', 'Noche'] },
       { neighborhood: 'Centro', schedule: 'Lun a Vie 08:00 a 12:00 y 16:00 a 20:30', shifts: ['Mañana', 'Tarde'] },
-      { neighborhood: 'Los Perales', schedule: 'Lun a Vie 08:30 a 12:00 y 17:00 a 21:00', shifts: ['Mañana', 'Tarde', 'Noche'] },
-      { neighborhood: 'San Pedrito', schedule: 'Lun a Vie 07:00 a 22:30 | Sáb 10:00 a 14:00', shifts: ['Mañana', 'Tarde', 'Noche'] }
+      { neighborhood: 'Los Perales', schedule: 'Lun a Vie 17:00 a 21:30', shifts: ['Tarde', 'Noche'] },
+      { neighborhood: 'San Pedrito', schedule: 'Lun a Vie 07:00 a 11:30 y 19:30 a 22:30', shifts: ['Mañana', 'Noche'] }
     ];
     return {
       ...inst,

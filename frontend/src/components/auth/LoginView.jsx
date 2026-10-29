@@ -160,7 +160,6 @@ export default function LoginView({ onLoginSuccess, onNavigateToRegister }) {
                     className="w-100 py-2 mt-2"
                     disabled={loading}
                   >
-                    <Icon name="box-arrow-in-right" className="me-1" />
                     {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
                   </Button>
 

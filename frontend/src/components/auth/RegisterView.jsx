@@ -130,7 +130,6 @@ export default function RegisterView({ onRegisterSuccess, onNavigateToLogin }) {
                     setError(null);
                   }}
                 >
-                  <Icon name="person-fill" className="me-1" />
                   Deportista / Cliente
                 </Button>
                 <Button
@@ -141,7 +140,6 @@ export default function RegisterView({ onRegisterSuccess, onNavigateToLogin }) {
                     setError(null);
                   }}
                 >
-                  <Icon name="building" className="me-1" />
                   Dueño de Centro Deportivo
                 </Button>
               </ButtonGroup>
@@ -485,7 +483,6 @@ export default function RegisterView({ onRegisterSuccess, onNavigateToLogin }) {
                 className="w-100 py-2"
                 disabled={loading}
               >
-                <Icon name="check-circle" className="me-1" />
                 {loading ? 'Creando cuenta...' : 'Crear Cuenta Gratuita'}
               </Button>
 

@@ -5,7 +5,6 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import Icon from '../common/Icon';
 
 export default function ManualMemberModal({
   isOpen,
@@ -156,7 +155,6 @@ export default function ManualMemberModal({
             Cancelar
           </Button>
           <Button variant="primary" type="submit">
-            <Icon name="check-lg" className="me-1" />
             Confirmar Alta y Guardar
           </Button>
         </Modal.Footer>

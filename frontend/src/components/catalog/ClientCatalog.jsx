@@ -331,11 +331,11 @@ export default function ClientCatalog({
                       {isEnrolled ? 'Matriculado' : 'No matriculado'}
                     </span>
                     <Button
-                      variant={isEnrolled ? 'secondary' : 'primary'}
+                      variant={isEnrolled ? 'outline-secondary' : 'primary'}
                       size="sm"
                       onClick={() => handleOpenEnroll(inst)}
                     >
-                      {isEnrolled ? 'Ver detalle' : 'Ver más / Asociarme'}
+                      Ver más
                     </Button>
                   </Card.Footer>
                 </Card>

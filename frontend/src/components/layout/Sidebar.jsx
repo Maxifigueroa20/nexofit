@@ -38,10 +38,9 @@ export default function Sidebar({
     <aside className="app-sidebar">
       {isOwner && (
         <Button
-          className="btn-premium w-100 py-1 d-flex align-items-center justify-content-center gap-1 mb-2"
+          className="btn-premium w-100 py-1 mb-2"
           onClick={onOpenPremiumModal}
         >
-          <Icon name="star-fill" />
           <span>{institution?.isPremium ? 'Sede Destacada' : 'Ser Sede Destacada'}</span>
         </Button>
       )}
@@ -289,7 +288,6 @@ export default function Sidebar({
                 className="w-100 mt-2"
                 onClick={onOpenManualModal}
               >
-                <Icon name="plus-lg" className="me-1" />
                 Nuevo Socio Mostrador
               </Button>
             )}
