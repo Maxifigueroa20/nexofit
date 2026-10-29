@@ -146,6 +146,69 @@ function generatePlansForCategory(category) {
   }
 }
 
+function generateTagline(category, neighborhood) {
+  const templates = {
+    Gimnasio: [
+      `Sala de musculación completa, peso libre y entrenamiento funcional en ${neighborhood}.`,
+      `Equipamiento biomecánico de última generación, rutinas a medida y ambiente motivador.`,
+      `Entrenamiento de fuerza y acondicionamiento físico con instructores certificados en ${neighborhood}.`,
+      `Tu espacio de alto rendimiento y superación en el corazón de ${neighborhood}.`,
+      `Musculación, zona de cardio y asesoramiento constante para alcanzar tus metas.`
+    ],
+    Pilates: [
+      `Estudio de reformer con grupos reducidos, enfoque postural y rehabilitación en ${neighborhood}.`,
+      `Fortalecimiento de zona media, elasticidad y salud articular con atención personalizada.`,
+      `Clases de pilates reformer y mat diseñadas para tu bienestar integral en ${neighborhood}.`,
+      `Mejora tu postura, tono muscular y flexibilidad con instructores dedicados.`
+    ],
+    Yoga: [
+      `Prácticas de Hatha, Vinyasa y meditación para conectar cuerpo y mente en ${neighborhood}.`,
+      `Shala tradicional con sesiones guiadas, respiración consciente y relajación profunda.`,
+      `Espacio de calma y armonía con clases para todos los niveles de experiencia en ${neighborhood}.`,
+      `Encuentra tu equilibrio diario a través de la práctica consciente y la respiración.`
+    ],
+    CrossFit: [
+      `Box oficial de alta intensidad: levantamiento olímpico, gimnásticos y WOD diarios en ${neighborhood}.`,
+      `Comunidad, disciplina y superación constante sin rutinas monótonas en ${neighborhood}.`,
+      `Entrenamiento funcional extremo adaptado a todos los niveles de condición física.`,
+      `Desafía tus límites en cada sesión con coaches certificados y equipamiento profesional.`
+    ],
+    Natación: [
+      `Natación formativa, pileta climatizada y programas de acondicionamiento acuático en ${neighborhood}.`,
+      `Carriles de 25 metros climatizados, escuela para adultos y niños todo el año en ${neighborhood}.`,
+      `Entrenamiento acuático de bajo impacto articular y alta quema calórica.`
+    ],
+    Pádel: [
+      `Canchas panorámicas de blindex con iluminación LED y torneos semanales en ${neighborhood}.`,
+      `Turnos fijos, alquiler de paletas y clínicas de perfeccionamiento técnico en ${neighborhood}.`,
+      `El punto de encuentro para apasionados del pádel con canchas de primer nivel.`
+    ],
+    'Artes Marciales': [
+      `Dojo especializado en técnica, defensa personal, respeto y acondicionamiento en ${neighborhood}.`,
+      `Entrenamiento integral de combate, disciplina marcial y preparación física rigurosa.`
+    ],
+    Calistenia: [
+      `Parque de barras cubierto, control del peso corporal y progresiones estáticas en ${neighborhood}.`,
+      `Fuerza pura y dominio corporal con entrenamientos progresivos para todos los niveles.`
+    ],
+    Spinning: [
+      `Sesiones de ciclismo indoor de alta intensidad con música y métricas en vivo en ${neighborhood}.`,
+      `Cardio intensivo, intervalos y potencia pedaleando junto a un grupo motivador.`
+    ],
+    Danza: [
+      `Clases de ritmos, expresión corporal y acondicionamiento dinámico en ${neighborhood}.`,
+      `Muévete, diviértete y entrena al ritmo de la música con profesores especializados.`
+    ]
+  };
+
+  const pool = templates[category] || [
+    `Instalaciones profesionales dedicadas a la práctica deportiva y la salud en ${neighborhood}.`,
+    `Espacio de entrenamiento, recreación y desarrollo deportivo integral en ${neighborhood}.`
+  ];
+
+  return faker.helpers.arrayElement(pool);
+}
+
 function buildSeeds() {
   const existingRaw = fs.readFileSync(SEED_FILE, 'utf8');
   const existing = JSON.parse(existingRaw);
@@ -198,7 +261,7 @@ function buildSeeds() {
       slug,
       name,
       category,
-      tagline: `Actividades de ${category.toLowerCase()} y bienestar en ${neighborhood}.`,
+      tagline: generateTagline(category, neighborhood),
       address,
       phone,
       isPremium,
