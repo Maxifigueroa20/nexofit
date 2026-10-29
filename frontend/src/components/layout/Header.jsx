@@ -5,22 +5,19 @@ export default function Header({ currentUser, currentInstitution }) {
   const isOwner = currentUser?.role === 'OWNER';
 
   return (
-    <header className="aero-window-top">
-      <div className="d-flex align-items-center gap-2">
-        <div className="aero-brand-icon">
-          <Icon name="link-45deg" />
-        </div>
-        <div>
-          <h1 className="aero-brand-title">NexoFit</h1>
-          <p className="aero-brand-subtitle">Red Deportiva &bull; Afiliaciones y Padrón</p>
-        </div>
+    <header className="app-window-top">
+      <div className="d-flex align-items-baseline gap-2">
+        <h1 className="brand-title mb-0">NexoFit</h1>
+        <span className="brand-subtitle d-none d-sm-inline">
+          &bull; Red Deportiva de Jujuy
+        </span>
       </div>
 
       <div className="d-flex align-items-center gap-2">
-        <span className="aero-user-badge">
-          <Icon name="person-circle" />
+        <span className="user-badge">
+          <Icon name="person-fill" />
           <strong>{currentUser?.name}</strong>
-          <span>
+          <span className="opacity-75">
             ({isOwner && currentInstitution ? currentInstitution.name : 'Cliente'})
           </span>
         </span>

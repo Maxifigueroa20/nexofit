@@ -1,5 +1,10 @@
-import React, { useState } from 'react';
-import Modal from '../common/Modal';
+import React, { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import Modal from 'react-bootstrap/Modal';
+import Button from 'react-bootstrap/Button';
+import Form from 'react-bootstrap/Form';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
 import Icon from '../common/Icon';
 
 export default function ManualMemberModal({
@@ -8,104 +13,123 @@ export default function ManualMemberModal({
   institution,
   onSubmit
 }) {
-  const [form, setForm] = useState({
-    fullName: '',
-    dni: '',
-    phone: '',
-    email: '',
-    planName: institution.plans[0]?.name || 'Pase Estándar',
-    monthlyAmount: institution.plans[0]?.price || 20000,
-    source: 'Directo (Mostrador)',
-    notes: 'Inscripción manual en mostrador de la sede.'
+  const {
+    register,
+    handleSubmit,
+    reset,
+    setValue,
+    formState: { errors }
+  } = useForm({
+    defaultValues: {
+      fullName: '',
+      dni: '',
+      phone: '',
+      email: '',
+      planName: institution?.plans?.[0]?.name || 'Pase Estándar',
+      monthlyAmount: institution?.plans?.[0]?.price || 20000,
+      source: 'Directo (Mostrador)',
+      notes: 'Inscripción manual en mostrador de la sede.'
+    }
   });
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!form.fullName || !form.dni) {
-      alert('Por favor complete Nombre y DNI');
-      return;
+  useEffect(() => {
+    if (isOpen) {
+      reset({
+        fullName: '',
+        dni: '',
+        phone: '',
+        email: '',
+        planName: institution?.plans?.[0]?.name || 'Pase Estándar',
+        monthlyAmount: institution?.plans?.[0]?.price || 20000,
+        source: 'Directo (Mostrador)',
+        notes: 'Inscripción manual en mostrador de la sede.'
+      });
     }
-    onSubmit(form);
+  }, [isOpen, institution, reset]);
+
+  const onFormSubmit = (data) => {
+    onSubmit(data);
   };
 
+  if (!institution) return null;
+
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      title={`Alta de Socio en Mostrador - ${institution.name}`}
-    >
-      <form onSubmit={handleSubmit}>
-        <div className="modal-body">
-          <div className="mb-2">
-            <label className="form-label small fw-bold mb-1">
+    <Modal show={Boolean(isOpen)} onHide={onClose} centered>
+      <Form onSubmit={handleSubmit(onFormSubmit)}>
+        <Modal.Header closeButton>
+          <Modal.Title className="fs-6 fw-bold">
+            Alta de Socio en Mostrador - {institution.name}
+          </Modal.Title>
+        </Modal.Header>
+
+        <Modal.Body>
+          <Form.Group className="mb-2" controlId="manualMemberFullName">
+            <Form.Label className="small fw-bold mb-1">
               Nombre y Apellido Completo *
-            </label>
-            <input
+            </Form.Label>
+            <Form.Control
               type="text"
-              required
-              className="form-control"
               placeholder="Ej. Lucas Daniel Herrera"
-              value={form.fullName}
-              onChange={(e) => setForm({ ...form, fullName: e.target.value })}
+              isInvalid={Boolean(errors.fullName)}
+              {...register('fullName', { required: 'Nombre y apellido requerido' })}
             />
-          </div>
+            <Form.Control.Feedback type="invalid">
+              {errors.fullName?.message}
+            </Form.Control.Feedback>
+          </Form.Group>
 
-          <div className="mb-2">
-            <label className="form-label small fw-bold mb-1">
+          <Form.Group className="mb-2" controlId="manualMemberDni">
+            <Form.Label className="small fw-bold mb-1">
               Documento de Identidad (DNI) *
-            </label>
-            <input
+            </Form.Label>
+            <Form.Control
               type="text"
-              required
-              className="form-control"
               placeholder="Ej. 37.890.123"
-              value={form.dni}
-              onChange={(e) => setForm({ ...form, dni: e.target.value })}
+              isInvalid={Boolean(errors.dni)}
+              {...register('dni', { required: 'DNI requerido' })}
             />
-          </div>
+            <Form.Control.Feedback type="invalid">
+              {errors.dni?.message}
+            </Form.Control.Feedback>
+          </Form.Group>
 
-          <div className="row g-2 mb-2">
-            <div className="col-6">
-              <label className="form-label small fw-bold mb-1">
-                Teléfono de Contacto
-              </label>
-              <input
-                type="text"
-                className="form-control"
-                placeholder="Ej. 11-4567-8901"
-                value={form.phone}
-                onChange={(e) => setForm({ ...form, phone: e.target.value })}
-              />
-            </div>
+          <Row className="g-2 mb-2">
+            <Col xs={6}>
+              <Form.Group controlId="manualMemberPhone">
+                <Form.Label className="small fw-bold mb-1">
+                  Teléfono de Contacto
+                </Form.Label>
+                <Form.Control
+                  type="text"
+                  placeholder="Ej. 388-412-3456"
+                  {...register('phone')}
+                />
+              </Form.Group>
+            </Col>
+            <Col xs={6}>
+              <Form.Group controlId="manualMemberEmail">
+                <Form.Label className="small fw-bold mb-1">
+                  Correo Electrónico
+                </Form.Label>
+                <Form.Control
+                  type="email"
+                  placeholder="Ej. lucas@gmail.com"
+                  {...register('email')}
+                />
+              </Form.Group>
+            </Col>
+          </Row>
 
-            <div className="col-6">
-              <label className="form-label small fw-bold mb-1">
-                Correo Electrónico
-              </label>
-              <input
-                type="email"
-                className="form-control"
-                placeholder="Ej. lucas@gmail.com"
-                value={form.email}
-                onChange={(e) => setForm({ ...form, email: e.target.value })}
-              />
-            </div>
-          </div>
-
-          <div className="mb-2">
-            <label className="form-label small fw-bold mb-1">
+          <Form.Group className="mb-2" controlId="manualMemberPlan">
+            <Form.Label className="small fw-bold mb-1">
               Plan / Membresía Seleccionada *
-            </label>
-            <select
-              className="form-select"
-              value={form.planName}
+            </Form.Label>
+            <Form.Select
+              {...register('planName')}
               onChange={(e) => {
                 const plan = institution.plans.find((p) => p.name === e.target.value);
-                setForm({
-                  ...form,
-                  planName: e.target.value,
-                  monthlyAmount: plan ? plan.price : form.monthlyAmount
-                });
+                setValue('planName', e.target.value);
+                if (plan) setValue('monthlyAmount', plan.price);
               }}
             >
               {institution.plans.map((p) => (
@@ -113,39 +137,30 @@ export default function ManualMemberModal({
                   {p.name} - ${p.price.toLocaleString('es-AR')} / {p.period}
                 </option>
               ))}
-            </select>
-          </div>
+            </Form.Select>
+          </Form.Group>
 
-          <div className="mb-2">
-            <label className="form-label small fw-bold mb-1">
+          <Form.Group className="mb-2" controlId="manualMemberNotes">
+            <Form.Label className="small fw-bold mb-1">
               Observaciones de Recepción
-            </label>
-            <input
+            </Form.Label>
+            <Form.Control
               type="text"
-              className="form-control"
-              value={form.notes}
-              onChange={(e) => setForm({ ...form, notes: e.target.value })}
+              {...register('notes')}
             />
-          </div>
-        </div>
+          </Form.Group>
+        </Modal.Body>
 
-        <div className="modal-footer">
-          <button
-            type="button"
-            className="btn btn-light"
-            onClick={onClose}
-          >
+        <Modal.Footer>
+          <Button variant="light" onClick={onClose}>
             Cancelar
-          </button>
-          <button
-            type="submit"
-            className="btn btn-primary"
-          >
-            <Icon name="check-lg" />
+          </Button>
+          <Button variant="primary" type="submit">
+            <Icon name="check-lg" className="me-1" />
             Confirmar Alta y Guardar
-          </button>
-        </div>
-      </form>
+          </Button>
+        </Modal.Footer>
+      </Form>
     </Modal>
   );
 }

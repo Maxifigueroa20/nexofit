@@ -1,48 +1,49 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { Routes, Route, Navigate, useNavigate } from 'react-router';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { Skeleton } from 'boneyard-js/react';
+import Container from 'react-bootstrap/Container';
 import Header from './components/layout/Header';
 import Sidebar from './components/layout/Sidebar';
 import OwnerDashboard from './components/admin/OwnerDashboard';
 import ClientCatalog from './components/catalog/ClientCatalog';
 import LoginView from './components/auth/LoginView';
+import RegisterView from './components/auth/RegisterView';
 import Toast from './components/common/Toast';
+import AdSidebar from './components/layout/AdSidebar';
+import PremiumModal from './components/admin/PremiumModal';
 import useSSE from './hooks/useSSE';
+import { useAppStore } from './store/useAppStore';
+import { getApiUrl } from './config/api';
 
 export default function App() {
-  const [currentUser, setCurrentUser] = useState(() => {
-    try {
-      const saved = localStorage.getItem('nexofit_user');
-      return saved ? JSON.parse(saved) : null;
-    } catch {
-      return null;
-    }
-  });
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
-  const [currentInstitution, setCurrentInstitution] = useState(() => {
-    try {
-      const saved = localStorage.getItem('nexofit_institution');
-      return saved ? JSON.parse(saved) : null;
-    } catch {
-      return null;
-    }
-  });
+  const {
+    currentUser,
+    currentInstitution,
+    setAuth,
+    setCurrentInstitution,
+    logout,
+    liveToast,
+    showToast,
+    clearToast,
+    isManualModalOpen,
+    setManualModalOpen,
+    isPremiumModalOpen,
+    setPremiumModalOpen,
+    members,
+    setMembers,
+    addMember,
+    updateMember,
+    institutions,
+    setInstitutions,
+    clientMemberships,
+    setClientMemberships
+  } = useAppStore();
 
-  const [activeTab, setActiveTab] = useState(() => {
-    try {
-      const savedUser = localStorage.getItem('nexofit_user');
-      if (savedUser) {
-        const u = JSON.parse(savedUser);
-        return u.role === 'OWNER' ? 'audit-table' : 'catalog';
-      }
-    } catch {}
-    return 'audit-table';
-  });
-
-  const [currentMembers, setCurrentMembers] = useState([]);
-  const [institutions, setInstitutions] = useState([]);
-  const [clientMemberships, setClientMemberships] = useState([]);
-  const [liveToast, setLiveToast] = useState(null);
   const [newlyAddedId, setNewlyAddedId] = useState(null);
-  const [isManualModalOpen, setIsManualModalOpen] = useState(false);
 
   const [ownerSearch, setOwnerSearch] = useState('');
   const [ownerStatusFilter, setOwnerStatusFilter] = useState('ALL');
@@ -51,63 +52,69 @@ export default function App() {
   const [clientCategory, setClientCategory] = useState('ALL');
   const [clientSearch, setClientSearch] = useState('');
 
-  const loadOwnerMembers = useCallback(async (instId) => {
-    if (!instId) return;
-    try {
-      const res = await fetch(`/api/institutions/${instId}/members`);
-      if (res.ok) {
-        const data = await res.json();
-        setCurrentMembers(data);
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  }, []);
+  const { data: institutionsData, isLoading: isLoadingInstitutions } = useQuery({
+    queryKey: ['institutions'],
+    queryFn: async () => {
+      const res = await fetch(getApiUrl('/api/institutions'));
+      if (!res.ok) throw new Error('Error al cargar instituciones');
+      return res.json();
+    },
+    enabled: Boolean(currentUser)
+  });
 
-  const loadInstitutions = useCallback(async () => {
-    try {
-      const res = await fetch('/api/institutions');
-      if (res.ok) {
-        const data = await res.json();
-        setInstitutions(data);
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  }, []);
+  const { data: ownerMembersData, isLoading: isLoadingOwnerMembers } = useQuery({
+    queryKey: ['ownerMembers', currentUser?.institutionId],
+    queryFn: async () => {
+      const res = await fetch(getApiUrl(`/api/institutions/${currentUser.institutionId}/members`));
+      if (!res.ok) throw new Error('Error al cargar socios');
+      return res.json();
+    },
+    enabled: Boolean(currentUser?.role === 'OWNER' && currentUser?.institutionId)
+  });
 
-  const loadClientMemberships = useCallback(async (dni) => {
-    if (!dni) return;
-    try {
-      const res = await fetch(`/api/members/by-dni/${dni}`);
-      if (res.ok) {
-        const data = await res.json();
-        setClientMemberships(data);
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  }, []);
+  const { data: clientMembershipsData, isLoading: isLoadingMemberships } = useQuery({
+    queryKey: ['clientMemberships', currentUser?.dni],
+    queryFn: async () => {
+      const res = await fetch(getApiUrl(`/api/members/by-dni/${currentUser.dni}`));
+      if (!res.ok) throw new Error('Error al cargar membresías');
+      return res.json();
+    },
+    enabled: Boolean(currentUser?.role === 'CLIENT' && currentUser?.dni)
+  });
+
+  const { data: currentInstData } = useQuery({
+    queryKey: ['currentInstitution', currentUser?.institutionId],
+    queryFn: async () => {
+      const res = await fetch(getApiUrl(`/api/institutions/${currentUser.institutionId}`));
+      if (!res.ok) throw new Error('Error al cargar institución');
+      return res.json();
+    },
+    enabled: Boolean(currentUser?.role === 'OWNER' && currentUser?.institutionId)
+  });
 
   useEffect(() => {
-    if (currentUser?.role === 'OWNER' && currentUser?.institutionId) {
-      loadOwnerMembers(currentUser.institutionId);
-      fetch(`/api/institutions/${currentUser.institutionId}`)
-        .then((r) => r.json())
-        .then((data) => {
-          if (!data.error) {
-            setCurrentInstitution(data);
-            localStorage.setItem('nexofit_institution', JSON.stringify(data));
-          }
-        })
-        .catch(console.error);
-    } else if (currentUser?.role === 'CLIENT') {
-      loadInstitutions();
-      if (currentUser?.dni) {
-        loadClientMemberships(currentUser.dni);
-      }
+    if (institutionsData) {
+      setInstitutions(institutionsData);
     }
-  }, [currentUser, loadOwnerMembers, loadInstitutions, loadClientMemberships]);
+  }, [institutionsData, setInstitutions]);
+
+  useEffect(() => {
+    if (ownerMembersData) {
+      setMembers(ownerMembersData);
+    }
+  }, [ownerMembersData, setMembers]);
+
+  useEffect(() => {
+    if (clientMembershipsData) {
+      setClientMemberships(clientMembershipsData);
+    }
+  }, [clientMembershipsData, setClientMemberships]);
+
+  useEffect(() => {
+    if (currentInstData) {
+      setCurrentInstitution(currentInstData);
+    }
+  }, [currentInstData, setCurrentInstitution]);
 
   const handleServerEvent = useCallback(
     (event) => {
@@ -115,102 +122,106 @@ export default function App() {
         const { institutionId, institutionName, member } = event.payload;
 
         if (currentUser?.role === 'OWNER' && currentUser?.institutionId === institutionId) {
-          setCurrentMembers((prev) =>
-            prev.some((m) => m.id === member.id) ? prev : [member, ...prev]
-          );
+          addMember(member);
           setNewlyAddedId(member.id);
           setTimeout(() => setNewlyAddedId(null), 4000);
-
-          setLiveToast({
-            title: `Nuevo Socio en ${institutionName}`,
-            body: `${member.fullName} (${member.dni}) contratado: ${member.planName}`
-          });
-          setTimeout(() => setLiveToast(null), 6000);
+          showToast(
+            `Nuevo Socio en ${institutionName}`,
+            `${member.fullName} (${member.dni}) contratado: ${member.planName}`
+          );
         }
 
-        if (currentUser?.role === 'CLIENT') {
-          loadInstitutions();
-          if (currentUser?.dni) {
-            loadClientMemberships(currentUser.dni);
-          }
-        }
+        queryClient.invalidateQueries({ queryKey: ['institutions'] });
+        queryClient.invalidateQueries({ queryKey: ['ownerMembers'] });
+        queryClient.invalidateQueries({ queryKey: ['clientMemberships'] });
       }
 
       if (event.type === 'PAYMENT_STATUS_CHANGED') {
         const { member } = event.payload;
         if (currentUser?.role === 'OWNER' && currentUser?.institutionId === member.institutionId) {
-          setCurrentMembers((prev) =>
-            prev.map((m) => (m.id === member.id ? member : m))
-          );
+          updateMember(member);
         }
-        if (currentUser?.role === 'CLIENT' && currentUser?.dni) {
-          loadClientMemberships(currentUser.dni);
-        }
+        queryClient.invalidateQueries({ queryKey: ['ownerMembers'] });
+        queryClient.invalidateQueries({ queryKey: ['clientMemberships'] });
       }
 
       if (event.type === 'ATTENDANCE_RECORDED') {
         const { member } = event.payload;
         if (currentUser?.role === 'OWNER' && currentUser?.institutionId === member.institutionId) {
-          setCurrentMembers((prev) =>
-            prev.map((m) => (m.id === member.id ? member : m))
-          );
+          updateMember(member);
         }
+        queryClient.invalidateQueries({ queryKey: ['ownerMembers'] });
+      }
+
+      if (event.type === 'INSTITUTION_UPDATED') {
+        queryClient.invalidateQueries({ queryKey: ['institutions'] });
+        queryClient.invalidateQueries({ queryKey: ['currentInstitution'] });
       }
 
       if (event.type === 'DB_RESET') {
-        if (currentUser?.role === 'OWNER' && currentUser?.institutionId) {
-          loadOwnerMembers(currentUser.institutionId);
-        }
-        if (currentUser?.role === 'CLIENT') {
-          loadInstitutions();
-          if (currentUser?.dni) {
-            loadClientMemberships(currentUser.dni);
-          }
-        }
-        setLiveToast({
-          title: 'Datos Restablecidos',
-          body: 'Se recargaron los seeds originales.'
-        });
-        setTimeout(() => setLiveToast(null), 4000);
+        queryClient.invalidateQueries({ queryKey: ['institutions'] });
+        queryClient.invalidateQueries({ queryKey: ['ownerMembers'] });
+        queryClient.invalidateQueries({ queryKey: ['clientMemberships'] });
+        queryClient.invalidateQueries({ queryKey: ['currentInstitution'] });
+        showToast('Base Restablecida', 'Los datos volvieron a las semillas iniciales de Jujuy.');
       }
     },
-    [currentUser, loadOwnerMembers, loadInstitutions, loadClientMemberships]
+    [currentUser, addMember, updateMember, showToast, queryClient]
   );
 
   useSSE(handleServerEvent);
 
   const handleLoginSuccess = (user, institution) => {
-    setCurrentUser(user);
-    setCurrentInstitution(institution);
-    localStorage.setItem('nexofit_user', JSON.stringify(user));
-    if (institution) {
-      localStorage.setItem('nexofit_institution', JSON.stringify(institution));
-    } else {
-      localStorage.removeItem('nexofit_institution');
-    }
-    setActiveTab(user.role === 'OWNER' ? 'audit-table' : 'catalog');
+    setAuth(user, institution);
+    queryClient.invalidateQueries();
+  };
+
+  const handleRegisterSuccess = (user, institution) => {
+    setAuth(user, institution);
+    queryClient.invalidateQueries();
+    showToast('¡Registro Exitoso!', `Bienvenido a NexoFit, ${user.name}. Tu cuenta ya se encuentra activa.`);
   };
 
   const handleLogout = () => {
-    setCurrentUser(null);
-    setCurrentInstitution(null);
-    localStorage.removeItem('nexofit_user');
-    localStorage.removeItem('nexofit_institution');
+    logout();
+    queryClient.clear();
+    navigate('/login');
   };
 
   const handleResetSeeds = async () => {
     try {
-      await fetch('/api/reset-seeds', { method: 'POST' });
+      await fetch(getApiUrl('/api/reset-seeds'), { method: 'POST' });
+      queryClient.invalidateQueries();
     } catch (err) {
       console.error(err);
     }
   };
 
-  if (!currentUser) {
-    return <LoginView onLoginSuccess={handleLoginSuccess} />;
-  }
+  const handleEnrollSuccess = useCallback(
+    (_newMember, _instId, instName) => {
+      queryClient.invalidateQueries({ queryKey: ['institutions'] });
+      queryClient.invalidateQueries({ queryKey: ['clientMemberships'] });
+      showToast(
+        '¡Solicitud Registrada!',
+        `Te has asociado exitosamente a ${instName}. Tu inscripción ya figura en la sede.`
+      );
+    },
+    [queryClient, showToast]
+  );
 
-  const filteredOwnerMembers = currentMembers.filter((m) => {
+  const handlePremiumActivated = (updatedInstitution) => {
+    setCurrentInstitution(updatedInstitution);
+    queryClient.invalidateQueries({ queryKey: ['institutions'] });
+    queryClient.invalidateQueries({ queryKey: ['currentInstitution'] });
+    showToast(
+      updatedInstitution.isPremium ? '¡Modo Premium Activado!' : 'Modo Premium Desactivado',
+      updatedInstitution.isPremium
+        ? `${updatedInstitution.name} ahora figura en el Puesto #1 del Catálogo con distintivo de Sede Destacada.`
+        : `${updatedInstitution.name} volvió a la modalidad regular.`
+    );
+  };
+
+  const filteredOwnerMembers = members.filter((m) => {
     const q = ownerSearch.toLowerCase();
     const matchesSearch =
       m.fullName.toLowerCase().includes(q) ||
@@ -224,19 +235,25 @@ export default function App() {
     return matchesSearch && matchesStatus && matchesSource;
   });
 
-  const filteredInstitutions = institutions.filter((inst) => {
-    const matchesCat =
-      clientCategory === 'ALL' ||
-      inst.category === clientCategory;
+  const filteredInstitutions = institutions
+    .filter((inst) => {
+      const matchesCat =
+        clientCategory === 'ALL' ||
+        inst.category === clientCategory;
 
-    const q = clientSearch.toLowerCase();
-    const matchesSearch =
-      inst.name.toLowerCase().includes(q) ||
-      inst.address.toLowerCase().includes(q) ||
-      inst.tagline.toLowerCase().includes(q);
+      const q = clientSearch.toLowerCase();
+      const matchesSearch =
+        inst.name.toLowerCase().includes(q) ||
+        inst.address.toLowerCase().includes(q) ||
+        inst.tagline.toLowerCase().includes(q);
 
-    return matchesCat && matchesSearch;
-  });
+      return matchesCat && matchesSearch;
+    })
+    .sort((a, b) => {
+      if (a.isPremium && !b.isPremium) return -1;
+      if (!a.isPremium && b.isPremium) return 1;
+      return 0;
+    });
 
   const ownerFiltersProp = {
     searchTerm: ownerSearch,
@@ -244,91 +261,181 @@ export default function App() {
     statusFilter: ownerStatusFilter,
     setStatusFilter: setOwnerStatusFilter,
     sourceFilter: ownerSourceFilter,
-    setSourceFilter: setOwnerSourceFilter,
-    totalCount: currentMembers.length,
-    filteredCount: filteredOwnerMembers.length
+    setSourceFilter: setOwnerSourceFilter
   };
 
   const clientFiltersProp = {
-    category: clientCategory,
-    setCategory: setClientCategory,
-    search: clientSearch,
-    setSearch: setClientSearch,
-    totalCount: institutions.length,
-    filteredCount: filteredInstitutions.length
+    selectedCategory: clientCategory,
+    setSelectedCategory: setClientCategory,
+    searchTerm: clientSearch,
+    setSearchTerm: setClientSearch
   };
 
-  return (
-    <div className="container py-4">
-      <div className="aero-window">
-        <Header
-          currentUser={currentUser}
-          currentInstitution={currentInstitution}
+  if (!currentUser) {
+    return (
+      <Routes>
+        <Route
+          path="/login"
+          element={
+            <LoginView
+              onLoginSuccess={handleLoginSuccess}
+              onNavigateToRegister={() => navigate('/register')}
+            />
+          }
         />
+        <Route
+          path="/register"
+          element={
+            <RegisterView
+              onRegisterSuccess={handleRegisterSuccess}
+              onNavigateToLogin={() => navigate('/login')}
+            />
+          }
+        />
+        <Route path="*" element={<Navigate to="/login" replace />} />
+      </Routes>
+    );
+  }
 
-        <div className="aero-window-body">
+  return (
+    <Container className="py-4">
+      <div className="app-window">
+        <Header currentUser={currentUser} currentInstitution={currentInstitution} />
+
+        <div className="app-window-body">
           <Sidebar
             role={currentUser.role}
-            activeTab={activeTab}
-            onTabChange={setActiveTab}
             institution={currentInstitution}
-            members={currentMembers}
-            onOpenManualModal={() => setIsManualModalOpen(true)}
+            members={members}
+            onOpenManualModal={() => setManualModalOpen(true)}
+            onOpenPremiumModal={() => setPremiumModalOpen(true)}
             onResetSeeds={handleResetSeeds}
             onLogout={handleLogout}
             ownerFilters={ownerFiltersProp}
             clientFilters={clientFiltersProp}
           />
 
-          <main className="aero-main">
-            {currentUser.role === 'OWNER' && currentInstitution ? (
-              <OwnerDashboard
-                institution={currentInstitution}
-                filteredMembers={filteredOwnerMembers}
-                activeTab={activeTab}
-                newlyAddedId={newlyAddedId}
-                isManualModalOpen={isManualModalOpen}
-                setIsManualModalOpen={setIsManualModalOpen}
-                onMemberUpdate={(updated) => {
-                  setCurrentMembers((prev) =>
-                    prev.map((m) => (m.id === updated.id ? updated : m))
-                  );
-                }}
-                onMemberCreated={(created) => {
-                  setCurrentMembers((prev) =>
-                    prev.some((m) => m.id === created.id) ? prev : [created, ...prev]
-                  );
-                }}
-              />
-            ) : currentUser.role === 'CLIENT' ? (
-              <ClientCatalog
-                currentUser={currentUser}
-                institutions={institutions}
-                filteredInstitutions={filteredInstitutions}
-                clientMemberships={clientMemberships}
-                activeTab={activeTab}
-                onEnrollSuccess={(newMember, instId, instName) => {
-                  loadInstitutions();
-                  if (currentUser?.dni) {
-                    loadClientMemberships(currentUser.dni);
-                  }
-                  setLiveToast({
-                    title: 'Inscripción Confirmada',
-                    body: `Te has afiliado a ${instName}. Tu alta ya se reflejó en tiempo real en el padrón del dueño.`
-                  });
-                  setTimeout(() => setLiveToast(null), 6000);
-                }}
-              />
-            ) : (
-              <div className="p-4 text-center text-muted">
-                Cargando perfil...
-              </div>
-            )}
+          <main className="app-main">
+            <Routes>
+              {currentUser.role === 'OWNER' ? (
+                <>
+                  <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                  <Route
+                    path="/dashboard"
+                    element={
+                      <Skeleton name="owner-dashboard" loading={isLoadingOwnerMembers || !currentInstitution}>
+                        {currentInstitution ? (
+                          <OwnerDashboard
+                            institution={currentInstitution}
+                            filteredMembers={filteredOwnerMembers}
+                            totalMembersCount={members.length}
+                            activeTab="audit-table"
+                            newlyAddedId={newlyAddedId}
+                            isManualModalOpen={isManualModalOpen}
+                            setIsManualModalOpen={setManualModalOpen}
+                            onMemberUpdate={updateMember}
+                            onMemberCreated={addMember}
+                          />
+                        ) : (
+                          <div className="p-4 text-center text-muted">
+                            Conectando con el servidor...
+                          </div>
+                        )}
+                      </Skeleton>
+                    }
+                  />
+                  <Route
+                    path="/dashboard/terms"
+                    element={
+                      <Skeleton name="owner-terms" loading={!currentInstitution}>
+                        {currentInstitution ? (
+                          <OwnerDashboard
+                            institution={currentInstitution}
+                            filteredMembers={filteredOwnerMembers}
+                            totalMembersCount={members.length}
+                            activeTab="terms-and-conditions"
+                            newlyAddedId={newlyAddedId}
+                            isManualModalOpen={isManualModalOpen}
+                            setIsManualModalOpen={setManualModalOpen}
+                            onMemberUpdate={updateMember}
+                            onMemberCreated={addMember}
+                          />
+                        ) : (
+                          <div className="p-4 text-center text-muted">
+                            Conectando con el servidor...
+                          </div>
+                        )}
+                      </Skeleton>
+                    }
+                  />
+                  <Route path="*" element={<Navigate to="/dashboard" replace />} />
+                </>
+              ) : (
+                <>
+                  <Route path="/" element={<Navigate to="/catalog" replace />} />
+                  <Route
+                    path="/catalog"
+                    element={
+                      <Skeleton name="client-catalog" loading={isLoadingInstitutions}>
+                        <ClientCatalog
+                          currentUser={currentUser}
+                          institutions={institutions}
+                          filteredInstitutions={filteredInstitutions}
+                          clientMemberships={clientMemberships}
+                          activeTab="catalog"
+                          onEnrollSuccess={handleEnrollSuccess}
+                        />
+                      </Skeleton>
+                    }
+                  />
+                  <Route
+                    path="/my-memberships"
+                    element={
+                      <Skeleton name="client-memberships" loading={isLoadingMemberships}>
+                        <ClientCatalog
+                          currentUser={currentUser}
+                          institutions={institutions}
+                          filteredInstitutions={filteredInstitutions}
+                          clientMemberships={clientMemberships}
+                          activeTab="my-memberships"
+                          onEnrollSuccess={handleEnrollSuccess}
+                        />
+                      </Skeleton>
+                    }
+                  />
+                  <Route
+                    path="/terms"
+                    element={
+                      <ClientCatalog
+                        currentUser={currentUser}
+                        institutions={institutions}
+                        filteredInstitutions={filteredInstitutions}
+                        clientMemberships={clientMemberships}
+                        activeTab="terms-and-conditions"
+                        onEnrollSuccess={handleEnrollSuccess}
+                      />
+                    }
+                  />
+                  <Route path="*" element={<Navigate to="/catalog" replace />} />
+                </>
+              )}
+            </Routes>
           </main>
+
+          {currentUser.role === 'CLIENT' && <AdSidebar />}
         </div>
       </div>
 
-      <Toast notification={liveToast} onClose={() => setLiveToast(null)} />
-    </div>
+      {currentUser.role === 'OWNER' && currentInstitution && (
+        <PremiumModal
+          isOpen={isPremiumModalOpen}
+          onClose={() => setPremiumModalOpen(false)}
+          institution={currentInstitution}
+          onPremiumActivated={handlePremiumActivated}
+        />
+      )}
+
+      <Toast notification={liveToast} onClose={clearToast} />
+    </Container>
   );
 }
