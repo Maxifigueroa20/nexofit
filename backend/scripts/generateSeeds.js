@@ -265,14 +265,27 @@ function buildSeeds() {
   const baseUsers = existing.users.slice(0, 7).map((u) => {
     let neighborhood = 'Centro';
     let preferredShift = 'Noche';
-    if (u.username === 'valeria_fit' || u.username === 'laura_yoga') {
+    if (u.username === 'valeria_cliente') {
       neighborhood = 'Los Perales';
       preferredShift = 'Tarde';
-    } else if (u.username === 'matias_cross' || u.username === 'martin_box') {
+    } else if (u.username === 'lucas_cliente') {
       neighborhood = 'San Pedrito';
+      preferredShift = 'Mañana';
+    } else if (u.username === 'mariano_cliente') {
+      neighborhood = 'Centro';
       preferredShift = 'Noche';
     } else if (u.username === 'carlos_titan') {
+      neighborhood = 'Centro';
       preferredShift = 'Mañana';
+    } else if (u.username === 'marcela_pilates') {
+      neighborhood = 'Centro';
+      preferredShift = 'Tarde';
+    } else if (u.username === 'esteban_yoga') {
+      neighborhood = 'Los Perales';
+      preferredShift = 'Tarde';
+    } else if (u.username === 'rodrigo_cross') {
+      neighborhood = 'San Pedrito';
+      preferredShift = 'Noche';
     }
     return {
       ...u,
