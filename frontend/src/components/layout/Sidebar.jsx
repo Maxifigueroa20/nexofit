@@ -4,6 +4,7 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Badge from 'react-bootstrap/Badge';
 import Icon from '../common/Icon';
+import { exportMonthlyReport } from '../../utils/reportExport';
 
 export default function Sidebar({
   role,
@@ -37,12 +38,22 @@ export default function Sidebar({
   return (
     <aside className="app-sidebar">
       {isOwner && (
-        <Button
-          className="btn-premium w-100 py-1 mb-2"
-          onClick={onOpenPremiumModal}
-        >
-          <span>{institution?.isPremium ? 'Sede Destacada' : 'Ser Sede Destacada'}</span>
-        </Button>
+        <div className="mb-2">
+          <Button
+            className="btn-premium w-100 py-1 mb-2"
+            onClick={onOpenPremiumModal}
+          >
+            <span>{institution?.isPremium ? 'Sede Destacada' : 'Ser Sede Destacada'}</span>
+          </Button>
+          <Button
+            variant="outline-primary"
+            size="sm"
+            className="w-100 py-1 bg-white"
+            onClick={() => exportMonthlyReport({ institution, members })}
+          >
+            Generar Reporte
+          </Button>
+        </div>
       )}
 
       <div className="sidebar-group">
