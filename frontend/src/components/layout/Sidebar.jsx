@@ -46,9 +46,9 @@ export default function Sidebar({
             <span>{institution?.isPremium ? 'Sede Destacada' : 'Ser Sede Destacada'}</span>
           </Button>
           <Button
-            variant="outline-primary"
+            variant="light"
             size="sm"
-            className="w-100 py-1 bg-white"
+            className="w-100 py-1"
             onClick={() => exportMonthlyReport({ institution, members })}
           >
             Generar Reporte
@@ -240,20 +240,20 @@ export default function Sidebar({
               (clientFilters.selectedNeighborhood && clientFilters.selectedNeighborhood !== 'ALL') ||
               (clientFilters.selectedShift && clientFilters.selectedShift !== 'ALL') ||
               clientFilters.searchTerm) && (
-              <Button
-                variant="light"
-                size="sm"
-                className="w-100 border text-muted"
-                onClick={() => {
-                  if (clientFilters.setSelectedCategory) clientFilters.setSelectedCategory('ALL');
-                  if (clientFilters.setSelectedNeighborhood) clientFilters.setSelectedNeighborhood('ALL');
-                  if (clientFilters.setSelectedShift) clientFilters.setSelectedShift('ALL');
-                  if (clientFilters.setSearchTerm) clientFilters.setSearchTerm('');
-                }}
-              >
-                Limpiar filtros
-              </Button>
-            )}
+                <Button
+                  variant="light"
+                  size="sm"
+                  className="w-100 border text-muted"
+                  onClick={() => {
+                    if (clientFilters.setSelectedCategory) clientFilters.setSelectedCategory('ALL');
+                    if (clientFilters.setSelectedNeighborhood) clientFilters.setSelectedNeighborhood('ALL');
+                    if (clientFilters.setSelectedShift) clientFilters.setSelectedShift('ALL');
+                    if (clientFilters.setSearchTerm) clientFilters.setSearchTerm('');
+                  }}
+                >
+                  Limpiar filtros
+                </Button>
+              )}
           </div>
         </div>
       )}
