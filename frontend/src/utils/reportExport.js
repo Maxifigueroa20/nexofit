@@ -100,10 +100,15 @@ export function exportMonthlyReport({ institution, members = [] }) {
   const blob = new Blob(['\uFEFF', html], { type: 'application/vnd.ms-excel;charset=utf-8' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  const safeName = (institution?.name || 'centro').toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/(^_|_$)/g, '');
+  const safeName = (institution?.name || 'centro')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '_')
+    .replace(/(^_|_$)/g, '');
   const dateFile = now.toISOString().slice(0, 10);
   a.href = url;
-  a.download = `padron_${safeName}_${dateFile}.xls`;
+  a.download = `reporte_${safeName}_${dateFile}.xls`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
